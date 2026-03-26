@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 // Icon eksternal navigasi
 import { GoArrowUpRight } from 'react-icons/go';
+import { Wallet } from 'lucide-react';
 
 // Komponen Navigasi Header Desktop
 
@@ -166,7 +167,12 @@ const CardNav = ({
           </div>
 
           <div className="logo-container flex items-center md:absolute md:left-1/2 md:top-1/2 md:-translate-x-1/2 md:-translate-y-1/2 order-1 md:order-none">
-            <img src={logo} alt={logoAlt} className="logo h-[28px]" />
+            <div className="flex items-center gap-2.5">
+              <div className="bg-gradient-to-br from-purple-600 to-purple-400 p-1.5 md:p-2 rounded-lg md:rounded-xl shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                <Wallet className="text-white w-5 h-5 md:w-6 md:h-6" />
+              </div>
+              <span className="text-xl md:text-2xl font-bold tracking-tight text-white">KasFlow</span>
+            </div>
           </div>
 
           <button

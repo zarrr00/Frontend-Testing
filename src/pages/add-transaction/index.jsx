@@ -13,14 +13,19 @@ export default function AddTransaction() {
   const [type, setType] = useState("expense"); 
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const incomeCategories = ["Penjualan", "Pendapatan Jasa", "Modal", "Lain-lain"];
+  const expenseCategories = ["Bahan Baku", "Operasional", "Pemasaran", "Gaji Pokok", "Tagihan", "Sewa", "Lain-lain"];
 
   // Sinkronisasi dengan Router State
   useEffect(() => {
     // Ubah tipe berdasarkan state dari Dashboard
     if (location.state && location.state.type) {
       setType(location.state.type);
+      setCategory(""); // Reset category saat tipe berubah
     }
   }, [location.state]); // Akan dijalankan ulang setiap kali lokasi/state router berubah
 
@@ -43,6 +48,7 @@ export default function AddTransaction() {
       setAmount("");
       setCategory("");
       setNotes("");
+      setDate(new Date().toISOString().split('T')[0]);
     } catch (error) {
       toast.error("Gagal menyimpan transaksi.");
     } finally {
@@ -61,7 +67,7 @@ export default function AddTransaction() {
       <div className="flex p-1.5 bg-slate-200/60 rounded-xl mb-6 shadow-inner">
         <button
           type="button"
-          onClick={() => setType("expense")}
+          onClick={() => { setType("expense"); setCategory(""); }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
             type === "expense" 
               ? "bg-white text-rose-600 shadow-md transform scale-[1.02]" 
@@ -73,7 +79,7 @@ export default function AddTransaction() {
         
         <button
           type="button"
-          onClick={() => setType("income")}
+          onClick={() => { setType("income"); setCategory(""); }}
           className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-bold rounded-lg transition-all duration-300 ${
             type === "income" 
               ? "bg-white text-emerald-600 shadow-md transform scale-[1.02]" 
@@ -107,24 +113,41 @@ export default function AddTransaction() {
           
           <CardContent className="space-y-4 border-t border-slate-100/50 pt-4 bg-white">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kategori</label>
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Tanggal</label>
               <Input 
-                placeholder={type === 'income' ? "Contoh: Penjualan, Modal, dll" : "Contoh: Bahan Baku, Listrik, dll"} 
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
                 disabled={isSubmitting}
                 className="bg-slate-50 h-12 rounded-xl" 
               />
             </div>
 
             <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Kategori</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                disabled={isSubmitting}
+                className="w-full bg-slate-50 h-12 rounded-xl border border-slate-200 px-3 text-sm text-slate-900 outline-none focus-visible:ring-1 focus-visible:ring-slate-950 transition-shadow"
+              >
+                <option value="" disabled>Pilih Kategori</option>
+                {type === 'income' 
+                  ? incomeCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)
+                  : expenseCategories.map(cat => <option key={cat} value={cat}>{cat}</option>)
+                }
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Catatan (Opsional)</label>
-              <Input 
+              <textarea 
+                rows={2}
                 placeholder="Tulis detail transaksi..." 
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 disabled={isSubmitting}
-                className="bg-slate-50 h-12 rounded-xl" 
+                className="w-full bg-slate-50 rounded-xl border border-slate-200 p-3 text-sm text-slate-900 outline-none focus-visible:ring-1 focus-visible:ring-slate-950 transition-shadow resize-none" 
               />
             </div>
 

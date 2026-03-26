@@ -1,9 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Prism from '../components/shared/Prism';
+import FloatingLines from '../components/ui/FloatingLines';
 import StaggeredMenu from '../components/shared/StaggeredMenu';
 import CardNav from '../components/shared/CardNav';
-import logo from '../assets/icons.svg'; // Ganti dengan path logo nanti
 import { ArrowRight, PieChart, Shield, Wallet, TrendingUp } from 'lucide-react';
 
 const Landing = () => {
@@ -59,19 +58,11 @@ const Landing = () => {
     // Wrapper Utama: Full screen dengan auto scroll
     <div className="relative w-full min-h-screen bg-black flex flex-col font-sans text-white">
       
-      {/* 1. Background Animasi Prism */}
-      <div className="fixed inset-0 z-0">
-        <Prism 
-          animationType="rotate" 
-          timeScale={0.3} 
-          height={3.5} 
-          baseWidth={5.5} 
-          scale={3.6} 
-          hueShift={0} 
-          colorFrequency={1} 
-          noise={0} 
-          glow={1} 
-          colors={['#B19EEF', '#5227FF']} // Aksen ungu
+      {/* 1. Background Animasi FloatingLines */}
+      <div className="fixed inset-0 z-0 pointer-events-auto">
+        <FloatingLines 
+          linesGradient={['#5227FF', '#B19EEF', '#170D27']}
+          animationSpeed={1.5}
         />
       </div>
 
