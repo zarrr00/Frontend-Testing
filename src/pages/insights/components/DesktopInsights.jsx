@@ -13,7 +13,8 @@ export default function DesktopInsights() {
   const isPersonal = mode === 'personal';
   const activeData = isPersonal ? personalData : umkmData;
   const themeColor = isPersonal ? 'text-purple-600' : 'text-blue-600';
-  const themeBg = isPersonal ? 'bg-purple-100' : 'bg-blue-100';
+  // Modifikasi sedikit themeBg agar tidak terlalu terang saat dark mode
+  const themeBg = isPersonal ? 'bg-purple-100 dark:bg-purple-900/20' : 'bg-blue-100 dark:bg-blue-900/20';
 
   const totalExpense = activeData.reduce((acc, curr) => acc + curr.value, 0);
 
@@ -46,24 +47,24 @@ export default function DesktopInsights() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-8 py-10 space-y-8 animate-in fade-in zoom-in-95 duration-500 relative">
+    <div className="w-full max-w-7xl mx-auto px-8 py-10 space-y-8 animate-in fade-in zoom-in-95 duration-500 relative bg-background text-foreground transition-colors">
       {/* Header Halaman */}
       <header className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Insight Keuangan</h1>
-          <p className="text-sm text-slate-500 mt-1">Analisis mendalam seputar arus kasmu.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">Insight Keuangan</h1>
+          <p className="text-sm text-muted-foreground mt-1">Analisis mendalam seputar arus kasmu.</p>
         </div>
         {!isPersonal && (
-          <button className="bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2">
+          <button className="bg-slate-900 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-500 text-white text-sm font-bold py-2.5 px-5 rounded-xl transition-all shadow-md hover:shadow-lg flex items-center gap-2 border-none">
             <Download className="w-4 h-4" /> Export Laporan (PDF)
           </button>
         )}
       </header>
 
-      {/* Grid Utama - Kolom Kiri Diberi Lebih Sedikit Ruang daripada Kolom Kanan */}
+      {/* Grid Utama */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
-        {/* Kolom Kiri: 1 Kolom */}
+        {/* Kolom Kiri */}
         <div className="space-y-6 flex flex-col h-full">
           
           {/* Kartu Saran / Insight Cerdas */}
@@ -72,7 +73,7 @@ export default function DesktopInsights() {
               <Lightbulb className={`w-6 h-6 shrink-0 mt-0.5 ${themeColor}`} />
               <div>
                 <h3 className={`text-base font-bold ${themeColor} mb-2`}>Insight Cerdas</h3>
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <p className="text-sm opacity-90 leading-relaxed">
                   Pengeluaran terbesarmu bulan ini ada di kategori <span className="font-bold">{activeData[0].name}</span>. 
                   {isPersonal ? " Coba kurangi jajan di luar untuk berhemat." : " Pastikan harga jual produkmu sudah menutupi modal ini."}
                 </p>
@@ -81,7 +82,7 @@ export default function DesktopInsights() {
           </Card>
 
           {/* Kartu Grafik Donut */}
-          <Card className="border-slate-200 shadow-sm overflow-hidden flex flex-col flex-1 min-h-[350px]">
+          <Card className="bg-card border-border shadow-sm overflow-hidden flex flex-col flex-1 min-h-[350px]">
             <CardHeader className="pb-0 shrink-0">
               <CardTitle className="text-base">Distribusi Kategori</CardTitle>
               <CardDescription className="text-sm">Berdasarkan pengeluaran Rp{totalExpense/1000000} Juta</CardDescription>
@@ -89,7 +90,7 @@ export default function DesktopInsights() {
             <CardContent className="p-0 flex flex-col items-center flex-1 justify-center">
               <div className="h-[220px] w-full mt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                  <PieChart>
                     <Pie
                       data={activeData}
                       cx="50%"
@@ -106,7 +107,7 @@ export default function DesktopInsights() {
                     </Pie>
                     <RechartsTooltip 
                       formatter={(value) => formatIDR(value)}
-                      contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '13px' }}
+                      contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px', fontSize: '13px' }}
                     />
                   </PieChart>
                 </ResponsiveContainer>
@@ -116,11 +117,11 @@ export default function DesktopInsights() {
                   <div key={index} className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-sm font-medium text-slate-700">{item.name}</span>
+                      <span className="text-sm font-medium text-muted-foreground">{item.name}</span>
                     </div>
                     <div className="flex items-center gap-4">
-                      <span className="text-sm font-bold text-slate-900">{formatIDR(item.value)}</span>
-                      <span className="text-xs text-slate-400 font-bold w-8 text-right">
+                      <span className="text-sm font-bold">{formatIDR(item.value)}</span>
+                      <span className="text-xs text-muted-foreground font-bold w-8 text-right">
                         {Math.round((item.value / totalExpense) * 100)}%
                       </span>
                     </div>
@@ -130,8 +131,8 @@ export default function DesktopInsights() {
             </CardContent>
           </Card>
 
-          {/* Gamification / Papan Prestasi (Ide Baru) */}
-          <Card className="border-slate-200 shadow-sm relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 shrink-0">
+          {/* Gamification Card */}
+          <Card className="border-none shadow-sm relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 shrink-0">
             <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-400/20 rounded-full blur-2xl"></div>
             <CardContent className="p-5 flex flex-col gap-4 relative z-10">
               <div className="flex items-center justify-between">
@@ -140,38 +141,35 @@ export default function DesktopInsights() {
                     <Trophy className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-slate-800">Master Finansial</h3>
+                    <h3 className="text-sm font-bold">Master Finansial</h3>
                     <p className="text-xs font-semibold text-amber-600 flex items-center gap-1">Level 4 <Sparkles className="w-3 h-3" /></p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-xs font-bold text-slate-700">850 XP</span>
-                  <p className="text-[10px] text-slate-500">ke Level 5</p>
+                <div className="text-right text-muted-foreground">
+                  <span className="text-xs font-bold text-foreground">850 XP</span>
+                  <p className="text-[10px]">ke Level 5</p>
                 </div>
               </div>
               <div className="space-y-1.5">
-                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden shadow-inner flex">
+                <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner flex">
                   <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full" style={{ width: '70%' }}></div>
                 </div>
-                <p className="text-[10px] text-slate-500 font-medium leading-relaxed">Hebat! Pengeluaranmu 15% lebih irit bulan ini (+50 XP). Terus pertahankan!</p>
+                <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Hebat! Pengeluaranmu 15% lebih irit bulan ini (+50 XP). Terus pertahankan!</p>
               </div>
             </CardContent>
           </Card>
-
         </div>
 
-        {/* Kolom Kanan: 2 Kolom */}
+        {/* Kolom Kanan */}
         <div className="lg:col-span-2 space-y-6">
-          
-          {/* Top Row: Trend & Profit/Loss */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            {/* Analisis Tren & Perbandingan */}
-            <Card className="border-slate-200 shadow-sm flex flex-col">
+            {/* Analisis Tren */}
+            <Card className="bg-card border-border shadow-sm flex flex-col">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base flex justify-between items-center">
                   <span>Perbandingan Tren</span>
-                  <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-full">
+                  <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 px-2.5 py-1 rounded-full">
                     <TrendingDown className="w-3.5 h-3.5" /> 15% Lebih Hemat
                   </div>
                 </CardTitle>
@@ -181,11 +179,11 @@ export default function DesktopInsights() {
                 <div className="h-[220px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={trendData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 12}} dx={0} tickFormatter={(val) => `${val/1000000}M`} />
-                      <RechartsTooltip cursor={{fill: '#f8fafc'}} contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '13px' }} />
-                      <Bar dataKey="lastMonth" fill="#cbd5e1" radius={[4, 4, 0, 0]} name="Bulan Lalu" />
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="opacity-10" />
+                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 12}} className="opacity-50" dy={10} />
+                      <YAxis axisLine={false} tickLine={false} tick={{fill: 'currentColor', fontSize: 12}} className="opacity-50" dx={0} tickFormatter={(val) => `${val/1000000}M`} />
+                      <RechartsTooltip cursor={{fill: 'currentColor', opacity: 0.1}} contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', color: 'var(--foreground)', borderRadius: '8px', fontSize: '13px' }} />
+                      <Bar dataKey="lastMonth" fill="#cbd5e1" radius={[4, 4, 0, 0]} name="Bulan Lalu" className="opacity-40" />
                       <Bar dataKey="thisMonth" fill="#3b82f6" radius={[4, 4, 0, 0]} name="Bulan Ini" />
                     </BarChart>
                   </ResponsiveContainer>
@@ -193,9 +191,9 @@ export default function DesktopInsights() {
               </CardContent>
             </Card>
 
-            {/* Profit & Loss Statement (Hanya untuk UMKM), jika personal tampilkan Budget Traks */}
+            {/* Profit & Loss / Budgeting */}
             {!isPersonal ? (
-              <Card className="bg-gradient-to-br from-slate-900 to-slate-800 text-white shadow-lg border-none relative overflow-hidden flex flex-col justify-between">
+              <Card className="bg-slate-900 text-white shadow-lg border-none relative overflow-hidden flex flex-col justify-between dark:bg-slate-950">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                 <CardHeader className="pb-4 relative z-10">
                   <div className="flex justify-between items-center">
@@ -225,65 +223,65 @@ export default function DesktopInsights() {
                 </CardContent>
               </Card>
             ) : (
-                <Card className="border-slate-200 shadow-sm flex flex-col h-full">
-                  <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Target className="w-5 h-5 text-rose-500" />
-                        Anggaran Kategori
-                      </CardTitle>
-                      <CardDescription className="text-sm">Pantau batas pengeluaranmu dari budget</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
-                      <Plus className="w-3.5 h-3.5" /> Budget
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-5 space-y-6 overflow-y-auto max-h-[300px]">
-                    {budgets.map((item, idx) => {
-                      const isOver = item.spent > item.limit;
-                      const pct = Math.min((item.spent / item.limit) * 100, 100);
-                      return (
-                        <div key={idx} className="space-y-2">
-                          <div className="flex justify-between text-sm font-bold text-slate-800">
-                            <span>{item.category}</span>
-                            <span className={isOver ? "text-rose-600" : "text-slate-600"}>
-                              {formatIDR(item.spent)} <span className="text-slate-400 font-normal">/ {formatIDR(item.limit)}</span>
-                            </span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner flex shrink-0">
-                            <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : item.color}`} style={{ width: `${pct}%` }}></div>
-                          </div>
-                          {isOver && (
-                            <p className="text-xs font-bold text-rose-500 flex items-center gap-1.5 mt-1">
-                              <AlertCircle className="w-3.5 h-3.5" /> Peringatan: Anggaran berlebih!
-                            </p>
-                          )}
+              <Card className="bg-card border-border shadow-sm flex flex-col h-full">
+                <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Target className="w-5 h-5 text-rose-500" />
+                      Anggaran Kategori
+                    </CardTitle>
+                    <CardDescription className="text-sm">Pantau batas pengeluaranmu dari budget</CardDescription>
+                  </div>
+                  <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
+                    <Plus className="w-3.5 h-3.5" /> Budget
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-5 space-y-6 overflow-y-auto max-h-[300px]">
+                  {budgets.map((item, idx) => {
+                    const isOver = item.spent > item.limit;
+                    const pct = Math.min((item.spent / item.limit) * 100, 100);
+                    return (
+                      <div key={idx} className="space-y-2">
+                        <div className="flex justify-between text-sm font-bold">
+                          <span>{item.category}</span>
+                          <span className={isOver ? "text-rose-600" : "text-muted-foreground"}>
+                            {formatIDR(item.spent)} <span className="opacity-40 font-normal">/ {formatIDR(item.limit)}</span>
+                          </span>
                         </div>
-                      )
-                    })}
-                  </CardContent>
-                </Card>
+                        <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex shrink-0">
+                          <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : item.color}`} style={{ width: `${pct}%` }}></div>
+                        </div>
+                        {isOver && (
+                          <p className="text-xs font-bold text-rose-500 flex items-center gap-1.5 mt-1">
+                            <AlertCircle className="w-3.5 h-3.5" /> Peringatan: Anggaran berlebih!
+                          </p>
+                        )}
+                      </div>
+                    )
+                  })}
+                </CardContent>
+              </Card>
             )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Top 5 Pengeluaran */}
-            <Card className="border-slate-200 shadow-sm flex flex-col h-full">
+            <Card className="bg-card border-border shadow-sm flex flex-col h-full">
               <CardHeader className="pb-4">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Receipt className="w-5 h-5 text-slate-500" />
+                  <Receipt className="w-5 h-5 text-muted-foreground" />
                   Top 5 Pengeluaran
                 </CardTitle>
                 <CardDescription className="text-sm">Pengeluaran terbesar bulan ini</CardDescription>
               </CardHeader>
               <CardContent className="p-5 pt-0 space-y-3 flex-1">
                 {topExpenses.map((trx, idx) => (
-                  <div key={trx.id} className="bg-slate-50 border border-slate-100 p-4 rounded-xl shadow-sm flex items-center justify-between hover:bg-slate-100 transition-colors">
+                  <div key={trx.id} className="bg-muted/50 border border-border p-4 rounded-xl shadow-sm flex items-center justify-between hover:bg-accent transition-colors">
                     <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 rounded-full bg-white border border-slate-200 text-slate-500 flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">{idx + 1}</div>
+                      <div className="w-8 h-8 rounded-full bg-card border border-border text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">{idx + 1}</div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900 line-clamp-1">{trx.name}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{trx.date}</p>
+                        <p className="text-sm font-bold line-clamp-1">{trx.name}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{trx.date}</p>
                       </div>
                     </div>
                     <p className="text-sm font-bold text-rose-600 shrink-0">-{formatIDR(trx.amount)}</p>
@@ -292,56 +290,46 @@ export default function DesktopInsights() {
               </CardContent>
             </Card>
 
-            {/* Smart Budgeting Tracker (If UMKM, show here since we used the slot above for PnL) */}
-            {!isPersonal && (
-              <Card className="border-slate-200 shadow-sm flex flex-col h-full">
-                <CardHeader className="pb-4 flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Target className="w-5 h-5 text-rose-500" />
-                        Anggaran Kategori
-                      </CardTitle>
-                      <CardDescription className="text-sm">Pantau batas pengeluaranmu dari budget</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
-                      <Plus className="w-3.5 h-3.5" /> Budget
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0 space-y-6 flex-1 overflow-y-auto max-h-[300px]">
-                    {budgets.map((item, idx) => {
-                      const isOver = item.spent > item.limit;
-                      const pct = Math.min((item.spent / item.limit) * 100, 100);
-                      return (
-                        <div key={idx} className="space-y-2">
-                          <div className="flex justify-between text-sm font-bold text-slate-800">
-                            <span>{item.category}</span>
-                            <span className={isOver ? "text-rose-600" : "text-slate-600"}>
-                              {formatIDR(item.spent)} <span className="text-slate-400 font-normal">/ {formatIDR(item.limit)}</span>
-                            </span>
-                          </div>
-                          <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden shadow-inner flex shrink-0">
-                            <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : item.color}`} style={{ width: `${pct}%` }}></div>
-                          </div>
-                          {isOver && (
-                            <p className="text-xs font-bold text-rose-500 flex items-center gap-1.5 mt-1">
-                              <AlertCircle className="w-3.5 h-3.5" /> Peringatan: Anggaran berlebih!
-                            </p>
-                          )}
-                        </div>
-                      )
-                    })}
-                  </CardContent>
-              </Card>
-            )}
-            {/* If personal, maybe showing a small empty state or some other insight in this second column */}
-            {isPersonal && (
-               <Card className="border-dashed border-2 bg-transparent border-slate-200 flex flex-col items-center justify-center p-8 text-center h-full min-h-[250px] shadow-none">
-                 <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mb-4">
-                   <Target className="w-8 h-8 text-slate-400" />
+            {/* Empty State / Tracker Placeholder */}
+            {isPersonal ? (
+               <Card className="border-dashed border-2 bg-transparent border-border flex flex-col items-center justify-center p-8 text-center h-full min-h-[250px] shadow-none">
+                 <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                   <Target className="w-8 h-8 text-muted-foreground" />
                  </div>
-                 <h3 className="text-sm font-bold text-slate-600">Jaga Pengeluaran Anda</h3>
-                 <p className="text-xs text-slate-400 mt-2 max-w-[200px]">Tetap berada dalam anggaran bulan ini untuk mencapai target tabungan liburan Anda.</p>
+                 <h3 className="text-sm font-bold text-foreground">Jaga Pengeluaran Anda</h3>
+                 <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">Tetap berada dalam anggaran bulan ini untuk mencapai target tabungan liburan Anda.</p>
                </Card>
+            ) : (
+              <Card className="bg-card border-border shadow-sm flex flex-col h-full">
+                <CardHeader className="pb-4 flex flex-row items-center justify-between">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Target className="w-5 h-5 text-rose-500" />
+                    Anggaran Kategori
+                  </CardTitle>
+                  <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
+                    <Plus className="w-3.5 h-3.5" /> Budget
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-5 pt-0 space-y-6 flex-1 overflow-y-auto max-h-[300px]">
+                  {budgets.map((item, idx) => {
+                    const isOver = item.spent > item.limit;
+                    const pct = Math.min((item.spent / item.limit) * 100, 100);
+                    return (
+                      <div key={idx} className="space-y-2">
+                        <div className="flex justify-between text-sm font-bold">
+                          <span>{item.category}</span>
+                          <span className={isOver ? "text-rose-600" : "text-muted-foreground"}>
+                            {formatIDR(item.spent)} <span className="opacity-40 font-normal">/ {formatIDR(item.limit)}</span>
+                          </span>
+                        </div>
+                        <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex shrink-0">
+                          <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : item.color}`} style={{ width: `${pct}%` }}></div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </CardContent>
+              </Card>
             )}
           </div>
         </div>
@@ -349,21 +337,21 @@ export default function DesktopInsights() {
 
       {/* Modal / Dialog Tambah Anggaran */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <Card className="w-full max-w-md shadow-2xl animate-in zoom-in-95 duration-200">
-            <CardHeader className="pb-4 border-b flex flex-row items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <Card className="w-full max-w-md bg-card border-border shadow-2xl animate-in zoom-in-95 duration-200">
+            <CardHeader className="pb-4 border-b border-border flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="text-lg">Tambah Anggaran Baru</CardTitle>
                 <CardDescription className="text-sm">Atur batas anggaran belanja untuk kategori tambahan.</CardDescription>
               </div>
               <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full -mr-2" onClick={() => setIsModalOpen(false)}>
-                <X className="w-5 h-5 text-slate-500" />
+                <X className="w-5 h-5 text-muted-foreground" />
               </Button>
             </CardHeader>
             <CardContent className="p-6">
               <form onSubmit={handleAddBudget} className="space-y-5">
                 <div className="space-y-2.5">
-                  <label className="text-sm font-bold text-slate-700">Pilih Kategori</label>
+                  <label className="text-sm font-bold">Pilih Kategori</label>
                   <select 
                     value={isCustomCategory ? 'custom' : newBudgetCategory}
                     onChange={(e) => {
@@ -375,7 +363,7 @@ export default function DesktopInsights() {
                       }
                     }}
                     required={!isCustomCategory}
-                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                   >
                     <option value="" disabled>-- Pilih Kategori --</option>
                     {isPersonal ? (
@@ -410,7 +398,7 @@ export default function DesktopInsights() {
                   )}
                 </div>
                 <div className="space-y-2.5">
-                  <label className="text-sm font-bold text-slate-700">Batas Anggaran (Rp)</label>
+                  <label className="text-sm font-bold">Batas Anggaran (Rp)</label>
                   <Input 
                     type="number" 
                     placeholder="Misal: 500000" 
@@ -420,7 +408,7 @@ export default function DesktopInsights() {
                     className="text-base py-2 h-10"
                   />
                 </div>
-                <Button type="submit" className="w-full mt-4 font-bold text-sm bg-blue-600 hover:bg-blue-700 h-10">Simpan Anggaran</Button>
+                <Button type="submit" className="w-full mt-4 font-bold text-sm bg-blue-600 hover:bg-blue-700 h-10 border-none text-white">Simpan Anggaran</Button>
               </form>
             </CardContent>
           </Card>

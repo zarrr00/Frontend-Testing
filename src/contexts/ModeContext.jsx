@@ -1,31 +1,61 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 
-// 1. Buat Context Mode
 const ModeContext = createContext();
 
-// 2. Provider Context
 export function ModeProvider({ children }) {
-  // Ambil mode dari storage, default 'umkm'
-  const [mode, setMode] = useState(() => {
-    return localStorage.getItem('kasflow-mode') || 'umkm'; 
+  // 1. State Mode (UMKM/Personal)
+  const [mode, setMode] = useState(() => localStorage.getItem('kasflow-mode') || 'umkm');
+
+  // 2. State Theme (Light/Dark) - Ambil dari localStorage
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+
+  // 3. State Notifications
+  const [notifications, setNotifications] = useState(() => {
+    const saved = localStorage.getItem('notifications');
+    return saved !== null ? JSON.parse(saved) : true;
   });
 
-  // Simpan mode ke storage tiap berubah
+  // EFFECT UNTUK THEME: Biar pas aplikasi jalan, class .dark langsung kepasang
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  // Simpan Mode ke Storage
   useEffect(() => {
     localStorage.setItem('kasflow-mode', mode);
   }, [mode]);
 
-  // Toggle Mode Personal/UMKM
-  const toggleMode = () => {
-    setMode((prevMode) => (prevMode === 'umkm' ? 'personal' : 'umkm'));
-  };
+  // Simpan Notif ke Storage
+  useEffect(() => {
+    localStorage.setItem('notifications', JSON.stringify(notifications));
+  }, [notifications]);
+
+  // --- SEMUA FUNGSI TOGGLE ---
+  const toggleMode = () => setMode((prev) => (prev === 'umkm' ? 'personal' : 'umkm'));
+  
+  const toggleTheme = () => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+
+  const toggleNotifications = () => setNotifications((prev) => !prev);
 
   return (
-    <ModeContext.Provider value={{ mode, toggleMode }}>
+    <ModeContext.Provider 
+      value={{ 
+        mode, 
+        theme, 
+        notifications, 
+        toggleMode, 
+        toggleTheme, 
+        toggleNotifications 
+      }}
+    >
       {children}
     </ModeContext.Provider>
   );
 }
 
-// 3. Hook Khusus Mode
 export const useMode = () => useContext(ModeContext);
