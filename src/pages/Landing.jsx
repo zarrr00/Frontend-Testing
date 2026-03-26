@@ -81,7 +81,6 @@ const Landing = () => {
         {/* Desktop Nav */}
         <div className="hidden md:block">
            <CardNav
-             logo={logo}
              items={desktopItems}
              baseColor="rgba(13, 7, 22, 0.4)" // Dark glass base
              menuColor="#fff"
