@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Bell, Lock, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useMode } from "@/contexts/ModeContext"; // Impor context jirr
+import { useMode } from "@/contexts/ModeContext";
 export default function MobileSettings() {
-  const navigate = useNavigate(); // Ambil dari context
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-background text-foreground p-4 pb-24 relative z-[9999] animate-in slide-in-from-right duration-300">
       {/* Header - Tombol Kembali */}
@@ -50,7 +50,7 @@ export default function MobileSettings() {
             </button>
             {/* TOMBOL GANTI AKUN */}
             <button 
-              onClick={() => alert("Fitur Ganti Akun segera hadir jirr!")}
+              onClick={() => alert("Fitur Ganti Akun segera hadir!")}
               className="w-full flex items-center justify-between p-5 active:bg-accent transition-colors text-left group cursor-pointer"
             >
               <div className="flex items-center gap-4 pointer-events-none">

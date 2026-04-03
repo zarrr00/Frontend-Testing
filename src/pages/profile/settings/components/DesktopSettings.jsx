@@ -59,7 +59,7 @@ export default function DesktopSettings() {
               <ChevronRight className="w-5 h-5 text-muted-foreground" />
             </button>
             <button 
-              onClick={() => alert("Fitur Ganti Akun segera hadir jirr!")}
+              onClick={() => alert("Fitur Ganti Akun segera hadir!")}
               className="w-full flex items-center justify-between p-6 hover:bg-accent/50 transition-all text-left group cursor-pointer"
             >
               <div className="flex items-center gap-5">
