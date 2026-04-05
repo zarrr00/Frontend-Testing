@@ -1,30 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { recurringService } from '../services/recurring.service';
 
-/**
- * Hook for managing recurring (scheduled) transactions with CRUD operations.
- *
- * @param {Object} [initialParams={}] - Initial query filters.
- * @returns {Object} Recurring state and mutation functions.
- */
-export const useRecurring = (initialParams = {}) => {
+export const useRecurring = () => {
   const [recurring, setRecurring] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [params, setParams] = useState(initialParams);
 
   const fetchRecurring = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await recurringService.getRecurring(params);
+      const data = await recurringService.getRecurring();
       setRecurring(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err);
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, []);
 
   useEffect(() => {
     fetchRecurring();
@@ -48,18 +41,5 @@ export const useRecurring = (initialParams = {}) => {
     return true;
   };
 
-  const updateParams = (newParams) => {
-    setParams(prev => ({ ...prev, ...newParams }));
-  };
-
-  return {
-    recurring,
-    loading,
-    error,
-    addRecurring,
-    editRecurring,
-    removeRecurring,
-    refresh: fetchRecurring,
-    updateParams,
-  };
+  return { recurring, loading, error, addRecurring, editRecurring, removeRecurring, refresh: fetchRecurring };
 };

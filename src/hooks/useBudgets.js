@@ -4,9 +4,6 @@ import { budgetService } from '../services/budget.service';
 /**
  * Hook for managing category budgets with CRUD operations.
  * Fetches budgets for the current month/year by default.
- *
- * @param {Object} [initialParams={}] - Initial query filters (profile_id, month, year).
- * @returns {Object} Budget state and mutation functions.
  */
 export const useBudgets = (initialParams = {}) => {
   const now = new Date();
@@ -17,13 +14,11 @@ export const useBudgets = (initialParams = {}) => {
   };
 
   const [budgets, setBudgets] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [params, setParams] = useState(defaultParams);
 
   const fetchBudgets = useCallback(async () => {
-    // Budget API requires profile_id — skip if not available yet
-    if (!params.profile_id) return;
     setLoading(true);
     setError(null);
     try {
@@ -41,9 +36,7 @@ export const useBudgets = (initialParams = {}) => {
   }, [fetchBudgets]);
 
   const addBudget = async (budgetData) => {
-    const newBudget = await budgetService.createBudget(budgetData, {
-      profile_id: params.profile_id,
-    });
+    const newBudget = await budgetService.createBudget(budgetData);
     setBudgets(prev => [newBudget, ...prev]);
     return newBudget;
   };

@@ -9,7 +9,6 @@ import { formatIDR } from '@/utils/currency';
 import { useDashboardData } from "../../dashboard/hooks/useDashboardData";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useCategories } from "@/hooks/useCategories";
-import { useProfiles } from "@/hooks/useProfiles";
 import { reportService } from "@/services/report.service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -25,8 +24,7 @@ import AnimatedContent from "@/components/ui/AnimatedContent";
 export default function DesktopInsights() {
   const { mode } = useMode(); 
   const { summary, chartData, categoryData, recentActivity, loading } = useDashboardData();
-  const { activeProfile } = useProfiles();
-  const { budgets, addBudget, loading: budgetsLoading } = useBudgets({ profile_id: activeProfile?.id });
+  const { budgets, addBudget, loading: budgetsLoading } = useBudgets();
   const { expenseCategories } = useCategories();
   
   const isPersonal = mode === 'personal';

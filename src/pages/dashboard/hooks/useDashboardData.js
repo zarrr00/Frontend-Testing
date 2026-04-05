@@ -14,10 +14,9 @@ export function useDashboardData() {
   const [recentActivity, setRecentActivity] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Sparkline data (decorative micro-charts, derived from chart data when available)
-  const sparklineBalance = [{ v: 4 }, { v: 5 }, { v: 3 }, { v: 6 }, { v: 5 }, { v: 7 }, { v: 8 }];
-  const sparklineIncome = [{ v: 3 }, { v: 4 }, { v: 5 }, { v: 4 }, { v: 6 }, { v: 5 }, { v: 7 }];
-  const sparklineExpense = [{ v: 5 }, { v: 4 }, { v: 6 }, { v: 3 }, { v: 5 }, { v: 4 }, { v: 3 }];
+  const [sparklineBalance, setSparklineBalance] = useState([{ v: 0 }]);
+  const [sparklineIncome, setSparklineIncome] = useState([{ v: 0 }]);
+  const [sparklineExpense, setSparklineExpense] = useState([{ v: 0 }]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -30,9 +29,22 @@ export function useDashboardData() {
         ]);
 
         if (summaryData) setSummary(summaryData);
-        if (Array.isArray(chartResult)) setChartData(chartResult);
+        if (Array.isArray(chartResult)) {
+          setChartData(chartResult);
+          if (chartResult.length > 0) {
+            setSparklineBalance(chartResult.map(d => ({ v: d.profit_loss })));
+            setSparklineIncome(chartResult.map(d => ({ v: d.income })));
+            setSparklineExpense(chartResult.map(d => ({ v: d.expense })));
+          }
+        }
         if (Array.isArray(recentResult)) setRecentActivity(recentResult);
-        if (Array.isArray(categoryResult)) setCategoryData(categoryResult);
+        if (Array.isArray(categoryResult)) {
+          const totalSum = categoryResult.reduce((acc, cat) => acc + (cat.total || 0), 0);
+          setCategoryData(categoryResult.map(cat => ({
+            ...cat,
+            value: totalSum > 0 ? Math.round((cat.total / totalSum) * 100) : 0
+          })));
+        }
       } catch (err) {
         console.error('Failed to load dashboard data:', err);
       } finally {

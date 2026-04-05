@@ -1,30 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { goalService } from '../services/goal.service';
 
-/**
- * Hook for managing financial saving goals with CRUD operations.
- *
- * @param {Object} [initialParams={}] - Initial query filters.
- * @returns {Object} Goals state and mutation functions.
- */
-export const useGoals = (initialParams = {}) => {
+export const useGoals = () => {
   const [goals, setGoals] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [params, setParams] = useState(initialParams);
 
   const fetchGoals = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await goalService.getGoals(params);
+      const data = await goalService.getGoals();
       setGoals(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err);
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, []);
 
   useEffect(() => {
     fetchGoals();
@@ -48,18 +41,5 @@ export const useGoals = (initialParams = {}) => {
     return true;
   };
 
-  const updateParams = (newParams) => {
-    setParams(prev => ({ ...prev, ...newParams }));
-  };
-
-  return {
-    goals,
-    loading,
-    error,
-    addGoal,
-    editGoal,
-    removeGoal,
-    refresh: fetchGoals,
-    updateParams,
-  };
+  return { goals, loading, error, addGoal, editGoal, removeGoal, refresh: fetchGoals };
 };

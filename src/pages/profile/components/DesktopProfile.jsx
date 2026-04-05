@@ -6,13 +6,22 @@ import {
   User, Settings, Bell, CircleHelp, LogOut, ChevronRight, Shield, Store, Moon, Sun, Pencil, Trophy, Flame, Medal, WalletCards
 } from "lucide-react";
 import { useMode } from "@/contexts/ModeContext";
+import { useAuth } from "@/contexts/AuthContext";
+
 export default function DesktopProfile() {
   const { mode, theme, notifications, toggleMode, toggleTheme, toggleNotifications } = useMode();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
   const isPersonal = mode === "personal";
   const isDark = theme === "dark";
   const themeColor = isPersonal ? "text-purple-600" : "text-blue-600";
   const themeBg = isPersonal ? "bg-purple-100 dark:bg-purple-900/30" : "bg-blue-100 dark:bg-blue-900/30";
+
+  const userName = user?.full_name || user?.name || "KasFlow User";
+  const userEmail = user?.email || "";
+  const initials = userName.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+
   return (
     <div className="w-full max-w-7xl mx-auto px-8 py-10 space-y-8 animate-in fade-in zoom-in-95 duration-500 bg-background text-foreground transition-colors" id="snap-main-container">
       <AnimatedContent distance={30} delay={0.1} direction="vertical">
@@ -32,11 +41,11 @@ export default function DesktopProfile() {
                 <Pencil className="w-5 h-5" />
               </button>
               <div className={`w-32 h-32 rounded-full flex items-center justify-center text-5xl font-extrabold ${themeBg} ${themeColor} shadow-inner`}>
-                AN
+                {initials}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-foreground">LelouchViBritania</h2>
-                <p className="text-sm text-muted-foreground mt-1 mb-4">Lelouch@codingcamp.id</p>
+                <h2 className="text-2xl font-bold text-foreground">{userName}</h2>
+                <p className="text-sm text-muted-foreground mt-1 mb-4">{userEmail}</p>
                 <span className={`text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider ${themeBg} ${themeColor}`}>
                   {isPersonal ? "Mengelola keuangan pribadi" : "Mengelola keuangan UMKM"}
                 </span>
@@ -73,7 +82,7 @@ export default function DesktopProfile() {
               </div>
             </Card>
           </div>
-          <Button variant="destructive" className="w-full h-14 font-bold text-lg gap-3 mt-4 shadow-sm hover:shadow-md transition-all">
+          <Button variant="destructive" onClick={logout} className="w-full h-14 font-bold text-lg gap-3 mt-4 shadow-sm hover:shadow-md transition-all">
             <LogOut className="w-5 h-5" /> {"Keluar Akun"}
           </Button>
         </AnimatedContent>

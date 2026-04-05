@@ -1,30 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { debtService } from '../services/debt.service';
 
-/**
- * Hook for managing debt/receivable records with CRUD operations.
- *
- * @param {Object} [initialParams={}] - Initial query filters.
- * @returns {Object} Debt state and mutation functions.
- */
-export const useDebts = (initialParams = {}) => {
+export const useDebts = () => {
   const [debts, setDebts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [params, setParams] = useState(initialParams);
 
   const fetchDebts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await debtService.getDebts(params);
+      const data = await debtService.getDebts();
       setDebts(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err);
     } finally {
       setLoading(false);
     }
-  }, [params]);
+  }, []);
 
   useEffect(() => {
     fetchDebts();
@@ -54,19 +47,5 @@ export const useDebts = (initialParams = {}) => {
     return true;
   };
 
-  const updateParams = (newParams) => {
-    setParams(prev => ({ ...prev, ...newParams }));
-  };
-
-  return {
-    debts,
-    loading,
-    error,
-    addDebt,
-    editDebt,
-    payDebt,
-    removeDebt,
-    refresh: fetchDebts,
-    updateParams,
-  };
+  return { debts, loading, error, addDebt, editDebt, payDebt, removeDebt, refresh: fetchDebts };
 };

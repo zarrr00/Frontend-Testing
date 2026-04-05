@@ -5,7 +5,7 @@ import TransactionSearchBox from "@/components/transactions/TransactionSearchBox
 import TransactionExportMenu from "@/components/transactions/TransactionExportMenu";
 import { handleExportPDF, handleExportCSV } from "@/utils/export";
 
-export default function MobileTransactions({ searchQuery, setSearchQuery, filteredTransactions }) {
+export default function MobileTransactions({ searchQuery, setSearchQuery, filteredTransactions, onDelete }) {
   return (
     <div className="pb-24 bg-background text-foreground p-4 space-y-4 animate-in fade-in zoom-in-95 duration-300 transition-colors w-full" id="snap-main-container">
       <AnimatedContent distance={30} delay={0.1} direction="vertical">
@@ -30,7 +30,7 @@ export default function MobileTransactions({ searchQuery, setSearchQuery, filter
           {filteredTransactions.length > 0 ? (
             filteredTransactions.map((trx, i) => (
               <AnimatedContent key={trx.id} distance={20} delay={0.4 + (i * 0.1)} direction="vertical">
-                <TransactionCard trx={trx} />
+                <TransactionCard trx={trx} onDelete={onDelete} />
               </AnimatedContent>
             ))
           ) : (

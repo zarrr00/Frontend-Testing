@@ -43,6 +43,19 @@ export default function Transactions() {
     );
   });
 
+  const handleDelete = async (id) => {
+    const isConfirm = window.confirm("Apakah Anda yakin ingin menghapus transaksi ini? Tindakan ini tidak dapat dibatalkan.");
+    if (!isConfirm) return;
+
+    try {
+      await transactionService.deleteTransaction(id);
+      setTransactions((prev) => prev.filter((trx) => trx.id !== id));
+    } catch (err) {
+      console.error('Failed to delete transaction:', err);
+      alert('Gagal menghapus transaksi: ' + err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
@@ -56,12 +69,14 @@ export default function Transactions() {
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
       filteredTransactions={filteredTransactions}
+      onDelete={handleDelete}
     />
   ) : (
     <MobileTransactions
       searchQuery={searchQuery}
       setSearchQuery={setSearchQuery}
       filteredTransactions={filteredTransactions}
+      onDelete={handleDelete}
     />
   );
 }

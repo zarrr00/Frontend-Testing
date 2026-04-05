@@ -13,13 +13,19 @@ const api = axios.create({
   },
 });
 
-// Attach Bearer token from localStorage to every outgoing request
+// Attach Bearer token and current profile mode from localStorage to every outgoing request
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('kasflow_token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
+    // Attach profile mode (personal vs business) so backend resolves the correct profile
+    const mode = localStorage.getItem('kasflow-mode') || 'personal';
+    const profileType = mode === 'umkm' ? 'business' : 'personal';
+    config.headers['X-Profile-Type'] = profileType;
+
     return config;
   },
   (error) => Promise.reject(error)

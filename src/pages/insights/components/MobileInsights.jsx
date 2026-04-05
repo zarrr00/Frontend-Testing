@@ -9,7 +9,6 @@ import { formatIDR } from '@/utils/currency';
 import { useDashboardData } from "../../dashboard/hooks/useDashboardData";
 import { useBudgets } from "@/hooks/useBudgets";
 import { useCategories } from "@/hooks/useCategories";
-import { useProfiles } from "@/hooks/useProfiles";
 import { reportService } from "@/services/report.service";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -35,8 +34,7 @@ export default function MobileInsights() {
   // Top Expenses
   const topExpenses = recentActivity.filter(t => t.type === 'expense').slice(0, 5);
   // Budget States
-  const { activeProfile } = useProfiles();
-  const { budgets, addBudget } = useBudgets({ profile_id: activeProfile?.id });
+  const { budgets, addBudget } = useBudgets();
   const { expenseCategories } = useCategories();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newBudgetCategory, setNewBudgetCategory] = useState('');

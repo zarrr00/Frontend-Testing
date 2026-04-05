@@ -5,7 +5,7 @@ import TransactionSearchBox from "@/components/transactions/TransactionSearchBox
 import TransactionExportMenu from "@/components/transactions/TransactionExportMenu";
 import { handleExportPDF, handleExportCSV } from "@/utils/export";
 
-export default function DesktopTransactions({ searchQuery, setSearchQuery, filteredTransactions }) {
+export default function DesktopTransactions({ searchQuery, setSearchQuery, filteredTransactions, onDelete }) {
   return (
     <div className="w-full max-w-7xl mx-auto px-8 py-10 space-y-8 animate-in fade-in zoom-in-95 duration-500 bg-background text-foreground transition-colors" id="snap-main-container">
       <div className="flex items-end justify-between">
@@ -34,7 +34,7 @@ export default function DesktopTransactions({ searchQuery, setSearchQuery, filte
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pb-10">
             {filteredTransactions.map((trx, i) => (
               <AnimatedContent key={trx.id} distance={20} delay={0.4 + (Math.min(i, 10) * 0.05)} direction="vertical">
-                <TransactionCard trx={trx} />
+                <TransactionCard trx={trx} onDelete={onDelete} />
               </AnimatedContent>
             ))}
           </div>

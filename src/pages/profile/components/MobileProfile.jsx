@@ -19,6 +19,8 @@ import {
   WalletCards
 } from "lucide-react";
 import { useMode } from "@/contexts/ModeContext";
+import { useAuth } from "@/contexts/AuthContext";
+
 export default function MobileProfile() {
   const {
     mode,
@@ -28,15 +30,18 @@ export default function MobileProfile() {
     toggleTheme,
     toggleNotifications,
   } = useMode();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
+  
   const isPersonal = mode === "personal";
   const isDark = theme === "dark";
-  const themeColor = isPersonal
-    ? "text-purple-600"
-    : "text-blue-600";
-  const themeBg = isPersonal
-    ? "bg-purple-100 dark:bg-purple-900/30"
-    : "bg-blue-100 dark:bg-blue-900/30";
+  const themeColor = isPersonal ? "text-purple-600" : "text-blue-600";
+  const themeBg = isPersonal ? "bg-purple-100 dark:bg-purple-900/30" : "bg-blue-100 dark:bg-blue-900/30";
+
+  const userName = user?.full_name || user?.name || "KasFlow User";
+  const userEmail = user?.email || "";
+  const initials = userName.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+
   return (
     <div className="pb-24 p-4 md:p-6 max-w-xl mx-auto w-full space-y-6 
     bg-background text-foreground animate-in fade-in transition-colors duration-300">
@@ -50,14 +55,14 @@ export default function MobileProfile() {
       <Card className="border-border bg-card shadow-sm overflow-hidden">
         <CardContent className="p-4 flex items-center gap-4">
           <div className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-extrabold ${themeBg} ${themeColor}`}>
-            AN
+            {initials}
           </div>
           <div className="flex-1">
             <h2 className="text-lg font-bold text-foreground">
-              Ahlun Najarrudin
+              {userName}
             </h2>
             <p className="text-xs text-muted-foreground mb-1">
-              ahlun.idcamp@gmail.com
+              {userEmail}
             </p>
             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${themeBg} ${themeColor}`}>
               {isPersonal ? "Personal" : "UMKM"}
@@ -277,7 +282,7 @@ export default function MobileProfile() {
       <Button
         variant="destructive"
         className="w-full h-12 mt-6 font-bold text-md gap-2"
-        onClick={() => navigate("/login")}
+        onClick={logout}
       >
         <LogOut className="w-5 h-5" />
         {"Keluar Akun"}

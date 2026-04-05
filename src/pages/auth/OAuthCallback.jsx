@@ -6,9 +6,12 @@ export default function OAuthCallback() {
   const location = useLocation();
   useEffect(() => {
     const handleLogin = async () => {
-      // Backend redirects to /auth/callback?access_token=...
+      // Check both search params (?) and hash fragments (#)
       const params = new URLSearchParams(location.search);
-      const accessToken = params.get('access_token');
+      const hashParams = new URLSearchParams(location.hash.replace('#', '?'));
+      
+      const accessToken = params.get('access_token') || hashParams.get('access_token');
+
       if (accessToken) {
         localStorage.setItem('kasflow_token', accessToken);
         try {
@@ -16,10 +19,10 @@ export default function OAuthCallback() {
           await authService.fetchCurrentUser();
           navigate('/dashboard', { replace: true });
         } catch (err) {
+          console.error('Auth check failed:', err);
           navigate('/login', { replace: true });
         }
       } else {
-        // Fallback or error
         navigate('/login', { replace: true });
       }
     };
