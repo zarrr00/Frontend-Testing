@@ -1,5 +1,6 @@
 import { useGoals } from '../../../hooks/useGoals';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 
 export default function MobileGoals() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { goals, loading, error, addGoal, removeGoal } = useGoals();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -40,26 +42,30 @@ export default function MobileGoals() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus tujuan menabung ini?')) {
-      try {
-        await removeGoal(id);
-        toast.success('Tujuan dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Target',
+      description: 'Yakin ingin menghapus tujuan menabung ini?',
+      onConfirm: async () => {
+        try {
+          await removeGoal(id);
+          toast.success('Tujuan dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (
     <div className="p-4 space-y-4">
       <AnimatedContent direction="vertical" delay={0}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-4 mb-2">
+          <div className="flex items-center gap-2 pr-24">
             <Target className={`w-6 h-6 text-${accentColor}-600`} />
             <h1 className="text-xl font-bold">Tujuan Keuangan</h1>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className={`p-2 rounded-xl text-white bg-${accentColor}-600 shadow-lg`}>
-            <Plus className="w-5 h-5" />
+          <button onClick={() => setIsModalOpen(true)} className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl text-white bg-${accentColor}-600 shadow-lg font-bold`}>
+            <Plus className="w-5 h-5" /> Buat Target Baru
           </button>
         </div>
       </AnimatedContent>

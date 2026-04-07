@@ -1,5 +1,6 @@
 import { useDebts } from '../../../hooks/useDebts';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 
 export default function DesktopDebts() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { debts, loading, error, addDebt, removeDebt } = useDebts();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -44,14 +46,18 @@ export default function DesktopDebts() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus catatan ini?')) {
-      try {
-        await removeDebt(id);
-        toast.success('Catatan dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Pencatatan',
+      description: 'Yakin ingin menghapus catatan ini?',
+      onConfirm: async () => {
+        try {
+          await removeDebt(id);
+          toast.success('Catatan dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (

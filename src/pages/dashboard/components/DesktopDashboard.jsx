@@ -10,6 +10,7 @@ import { formatIDR } from "@/utils/currency";
 import { transactionService } from "@/services/transaction.service";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedContent from "@/components/ui/AnimatedContent";
+import { toast } from "sonner";
 
 export default function DesktopDashboard() {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ export default function DesktopDashboard() {
       });
     } catch (err) {
       console.error("OCR scan failed:", err);
-      alert("Gagal scan struk: " + err);
+      toast.error("Gagal scan struk: " + (err.message || err));
     } finally {
       setIsScanning(false);
     }

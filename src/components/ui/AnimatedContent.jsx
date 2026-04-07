@@ -40,9 +40,10 @@ const AnimatedContent = ({
       opacity: animateOpacity ? initialOpacity : 1,
       visibility: 'visible'
     });
+    const normalizedDelay = delay > 10 ? delay / 1000 : delay;
     const tl = gsap.timeline({
       paused: true,
-      delay,
+      delay: normalizedDelay,
       onComplete: () => {
         if (onComplete) onComplete();
         if (disappearAfter > 0) {

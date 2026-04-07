@@ -1,5 +1,6 @@
 import { useRecurring } from '../../../hooks/useRecurring';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -17,6 +18,7 @@ const FREQ_LABEL = {
 
 export default function DesktopRecurring() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { recurring, loading, error, addRecurring, removeRecurring } = useRecurring();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -45,14 +47,18 @@ export default function DesktopRecurring() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus otomatisasi ini?')) {
-      try {
-        await removeRecurring(id);
-        toast.success('Dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Otomatisasi',
+      description: 'Yakin ingin menghapus otomatisasi ini?',
+      onConfirm: async () => {
+        try {
+          await removeRecurring(id);
+          toast.success('Dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (

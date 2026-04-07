@@ -1,5 +1,6 @@
 import { useGoals } from '../../../hooks/useGoals';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 
 export default function DesktopGoals() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { goals, loading, error, addGoal, removeGoal } = useGoals();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -40,14 +42,18 @@ export default function DesktopGoals() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus tujuan menabung ini?')) {
-      try {
-        await removeGoal(id);
-        toast.success('Tujuan dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Target',
+      description: 'Yakin ingin menghapus tujuan menabung ini?',
+      onConfirm: async () => {
+        try {
+          await removeGoal(id);
+          toast.success('Tujuan dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (

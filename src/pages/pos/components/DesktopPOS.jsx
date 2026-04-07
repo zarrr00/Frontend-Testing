@@ -1,5 +1,6 @@
 import { usePOS } from '../../../hooks/usePOS';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { useCategories } from '../../../hooks/useCategories';
 import { productService } from '../../../services/product.service';
 import { formatIDR } from '../../../utils/currency';
@@ -11,6 +12,7 @@ import { toast } from 'sonner';
 
 export default function DesktopPOS() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const {
     products, cart, cartTotal, loading, error, refreshProducts,
     addToCart, updateCartItem, removeFromCart, clearCart, placeOrder,
@@ -68,16 +70,20 @@ export default function DesktopPOS() {
 
   const handleDeleteProduct = async (e, id) => {
     e.stopPropagation();
-    if (confirm('Yakin ingin menghapus produk ini dari katalog?')) {
-      try {
-        await productService.deleteProduct(id);
-        toast.success('Produk dihapus');
-        await refreshProducts();
-        removeFromCart(id);
-      } catch (err) {
-        toast.error('Gagal menghapus produk');
+    confirmDialog({
+      title: 'Hapus Produk',
+      description: 'Yakin ingin menghapus produk ini dari katalog?',
+      onConfirm: async () => {
+        try {
+          await productService.deleteProduct(id);
+          toast.success('Produk dihapus');
+          await refreshProducts();
+          removeFromCart(id);
+        } catch (err) {
+          toast.error('Gagal menghapus produk');
+        }
       }
-    }
+    });
   };
 
   return (

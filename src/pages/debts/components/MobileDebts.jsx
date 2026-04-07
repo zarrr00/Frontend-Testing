@@ -1,5 +1,6 @@
 import { useDebts } from '../../../hooks/useDebts';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
 
 export default function MobileDebts() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { debts, loading, error, addDebt, removeDebt } = useDebts();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -44,26 +46,30 @@ export default function MobileDebts() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus catatan ini?')) {
-      try {
-        await removeDebt(id);
-        toast.success('Catatan dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Pencatatan',
+      description: 'Yakin ingin menghapus catatan ini?',
+      onConfirm: async () => {
+        try {
+          await removeDebt(id);
+          toast.success('Catatan dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (
     <div className="p-4 space-y-4">
       <AnimatedContent direction="vertical" delay={0}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-4 mb-2">
+          <div className="flex items-center gap-2 pr-24">
             <HandCoins className={`w-6 h-6 text-${accentColor}-600`} />
             <h1 className="text-xl font-bold">Hutang & Piutang</h1>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className={`p-2 rounded-xl text-white bg-${accentColor}-600 shadow-lg`}>
-            <Plus className="w-5 h-5" />
+          <button onClick={() => setIsModalOpen(true)} className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl text-white bg-${accentColor}-600 shadow-lg font-bold`}>
+            <Plus className="w-5 h-5" /> Catat Hutang / Piutang
           </button>
         </div>
       </AnimatedContent>

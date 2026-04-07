@@ -1,14 +1,35 @@
 import { Outlet, NavLink } from 'react-router-dom';
 import { Home, Receipt, PlusCircle, Plus, WalletCards, User, Store, PieChart, UserCircle, HandCoins, Target, RefreshCw, ShoppingCart, Users, Bell, MoreHorizontal } from 'lucide-react';
 import { useMode } from '../contexts/ModeContext';
+import { useConfirm } from '../contexts/ConfirmContext';
 import AIChatBot from '../components/chat/AIChatBot';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 export default function AppLayout() {
   const { mode, toggleMode, theme } = useMode();
+  const { confirmDialog } = useConfirm();
   const isPersonal = mode === 'personal';
   const isDark = theme === 'dark';
   const [showMore, setShowMore] = useState(false);
+
+  const handleToggleMode = () => {
+    const targetMode = mode === 'personal' ? 'UMKM / Bisnis' : 'Personal';
+    const targetIcon = mode === 'personal' ? <Store className="w-5 h-5 text-blue-500" /> : <User className="w-5 h-5 text-purple-500" />;
+    
+    confirmDialog({
+      title: `Beralih ke Mode ${targetMode}`,
+      description: `Aplikasi akan dimuat ulang untuk menyesuaikan ruang lingkup data ${targetMode} Anda. Lanjutkan?`,
+      confirmText: 'Ya, Beralih',
+      isDestructive: false,
+      icon: targetIcon,
+      onConfirm: () => {
+        toggleMode();
+        toast.loading(`Mempersiapkan data ruang lingkup ${targetMode}...`);
+        setTimeout(() => window.location.reload(), 1000);
+      }
+    });
+  };
 
   // Colors
   const modeColor = isPersonal ? 'bg-purple-600' : 'bg-blue-600';
@@ -37,10 +58,10 @@ export default function AppLayout() {
         </div>
         {/* Mode Switcher */}
         <div className="mb-6 p-1 bg-muted rounded-xl flex border border-border">
-          <button onClick={toggleMode} className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${isPersonal ? 'bg-card text-purple-600 dark:text-purple-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+          <button onClick={handleToggleMode} className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${isPersonal ? 'bg-card text-purple-600 dark:text-purple-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
             <User className="w-4 h-4" /> {"Personal"}
           </button>
-          <button onClick={toggleMode} className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${!isPersonal ? 'bg-card text-blue-600 dark:text-blue-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
+          <button onClick={handleToggleMode} className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold rounded-lg transition-all ${!isPersonal ? 'bg-card text-blue-600 dark:text-blue-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>
             <Store className="w-4 h-4" /> {"UMKM"}
           </button>
         </div>
@@ -96,7 +117,7 @@ export default function AppLayout() {
       <main className="flex-1 overflow-y-auto pb-28 md:pb-0 relative bg-background">
         {/* Mobile Toggle */}
         <div className="md:hidden absolute top-4 right-4 z-50">
-          <button onClick={toggleMode} className={`flex items-center gap-2 px-3 py-2 rounded-full shadow-lg text-xs font-bold text-white transition-all active:scale-95 ${modeColor}`}>
+          <button onClick={handleToggleMode} className={`flex items-center gap-2 px-3 py-2 rounded-full shadow-lg text-xs font-bold text-white transition-all active:scale-95 ${modeColor}`}>
             {isPersonal ? <><User className="w-3.5 h-3.5" /> {"Personal"}</> : <><Store className="w-3.5 h-3.5" /> {"UMKM"}</>}
           </button>
         </div>

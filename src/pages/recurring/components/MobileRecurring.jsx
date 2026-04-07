@@ -1,5 +1,6 @@
 import { useRecurring } from '../../../hooks/useRecurring';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
@@ -17,6 +18,7 @@ const FREQ_LABEL = {
 
 export default function MobileRecurring() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { recurring, loading, error, addRecurring, removeRecurring } = useRecurring();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -45,26 +47,30 @@ export default function MobileRecurring() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus otomatisasi ini?')) {
-      try {
-        await removeRecurring(id);
-        toast.success('Dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus');
+    confirmDialog({
+      title: 'Hapus Otomatisasi',
+      description: 'Yakin ingin menghapus otomatisasi ini?',
+      onConfirm: async () => {
+        try {
+          await removeRecurring(id);
+          toast.success('Dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus');
+        }
       }
-    }
+    });
   };
 
   return (
     <div className="p-4 space-y-4">
       <AnimatedContent direction="vertical" delay={0}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-4 mb-2">
+          <div className="flex items-center gap-2 pr-24">
             <RefreshCw className={`w-6 h-6 text-${accentColor}-600`} />
-            <h1 className="text-xl font-bold">Transaksi Berulang</h1>
+            <h1 className="text-xl font-bold leading-tight">Transaksi Berulang</h1>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className={`p-2 rounded-xl text-white bg-${accentColor}-600 shadow-lg`}>
-            <Plus className="w-5 h-5" />
+          <button onClick={() => setIsModalOpen(true)} className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl text-white bg-${accentColor}-600 shadow-lg font-bold`}>
+            <Plus className="w-5 h-5" /> Tambah Transaksi
           </button>
         </div>
       </AnimatedContent>

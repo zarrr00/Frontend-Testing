@@ -1,5 +1,6 @@
 import { useMembers } from '../../../hooks/useMembers';
 import { useMode } from '../../../contexts/ModeContext';
+import { useConfirm } from '../../../contexts/ConfirmContext';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
 import { Users, UserPlus, Trash2, Mail, Shield } from 'lucide-react';
 import { useState } from 'react';
@@ -7,6 +8,7 @@ import { toast } from 'sonner';
 
 export default function DesktopMembers() {
   const { mode } = useMode();
+  const { confirmDialog } = useConfirm();
   const { members, loading, error, invite, removeMember } = useMembers();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
@@ -29,14 +31,18 @@ export default function DesktopMembers() {
   };
 
   const handleDelete = async (id) => {
-    if (confirm('Yakin ingin menghapus anggota ini?')) {
-      try {
-        await removeMember(id);
-        toast.success('Anggota dihapus');
-      } catch (err) {
-        toast.error('Gagal menghapus anggota');
+    confirmDialog({
+      title: 'Hapus Anggota',
+      description: 'Yakin ingin menghapus anggota ini?',
+      onConfirm: async () => {
+        try {
+          await removeMember(id);
+          toast.success('Anggota dihapus');
+        } catch (err) {
+          toast.error('Gagal menghapus anggota');
+        }
       }
-    }
+    });
   };
 
   return (
