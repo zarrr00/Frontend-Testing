@@ -251,7 +251,9 @@ export default function DesktopInsights() {
                       <CardTitle className="text-base flex items-center gap-2">
                         <FileText className="w-5 h-5 text-blue-400" /> Monthly Report
                       </CardTitle>
-                      <CardDescription className="text-xs font-medium text-slate-400">Oct 2024</CardDescription>
+                      <CardDescription className="text-xs font-medium text-slate-400">
+                        {new Date().toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}
+                      </CardDescription>
                     </div>
                   </CardHeader>
                   <CardContent className="p-6 pt-0 space-y-6 relative z-10 flex-1 flex flex-col justify-between">
