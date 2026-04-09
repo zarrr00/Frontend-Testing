@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
-import { Loader2, ArrowDownCircle, ArrowUpCircle } from "lucide-react";
+import { Loader2, ArrowDownCircle, ArrowUpCircle, Camera, Sparkles } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { transactionService } from "@/services/transaction.service";
 import { useCategories } from "@/hooks/useCategories";
+import { useOCR } from "@/hooks/useOCR";
 
 export default function AddTransaction() {
   const location = useLocation();
@@ -22,6 +23,38 @@ export default function AddTransaction() {
 
   // Fetch real categories from backend API
   const { incomeCategories, expenseCategories, loading: categoriesLoading } = useCategories();
+
+  // OCR Hooks and Ref
+  const fileInputRef = useRef(null);
+  const { scanReceipt, isScanning } = useOCR();
+
+  const handleScanClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const result = await scanReceipt(file);
+      const ocrData = result.data;
+      if (ocrData.suggested_total) {
+        setAmount(ocrData.suggested_total.toString());
+      }
+      if (ocrData.suggested_date) {
+         setDate(ocrData.suggested_date);
+      }
+      if (ocrData.extracted_text) {
+         setNotes(`[Hasil Scan Struk]:\n${ocrData.extracted_text}\n\nURL Bukti: ${ocrData.url}`);
+      }
+      toast.success("Berhasil memindai struk canggih!");
+      setType("expense"); // Struk usually implies expense
+      e.target.value = ''; // Reset input to allow scanning the same file again if needed
+    } catch (err) {
+      toast.error(err?.message || "Gagal memindai gambar.");
+    }
+  };
 
   // Sync form state with router navigation params (type from quick-action, amount from OCR)
   useEffect(() => {
@@ -93,6 +126,46 @@ export default function AddTransaction() {
           }`}
         >
           <ArrowUpCircle className="w-4 h-4" /> Pemasukan
+        </button>
+      </div>
+
+      <input 
+        type="file" 
+        accept="image/*" 
+        capture="environment"
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        className="hidden" 
+      />
+      
+      {/* OCR Magic Button */}
+      <div className="mb-6">
+        <button
+          type="button"
+          onClick={handleScanClick}
+          disabled={isScanning || isSubmitting}
+          className="w-full relative overflow-hidden group flex items-center justify-between gap-3 p-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+        >
+          <div className="flex items-center gap-3 relative z-10 w-full">
+            <div className={`p-2.5 bg-white/20 rounded-xl backdrop-blur-md border border-white/10 ${isScanning ? 'animate-pulse' : ''}`}>
+              {isScanning ? <Loader2 className="w-5 h-5 animate-spin" /> : <Camera className="w-5 h-5" />}
+            </div>
+            <div className="text-left flex-1 min-w-0">
+              <h3 className="font-bold text-[15px] tracking-wide">
+                {isScanning ? 'Sedang Memindai...' : 'Pindai Struk dengan AI'}
+              </h3>
+              <p className="text-[11px] text-blue-50 font-medium opacity-90 line-clamp-1">
+                {isScanning ? 'Membaca nominal dan data...' : 'Ambil foto struk untuk isi otomatis'}
+              </p>
+            </div>
+          </div>
+          {!isScanning && (
+            <div className="flex-shrink-0 relative z-10 p-1.5 bg-indigo-800/30 rounded-full">
+              <Sparkles className="w-5 h-5 text-yellow-300 animate-pulse" />
+            </div>
+          )}
+          
+          <div className="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-shimmer" />
         </button>
       </div>
 
