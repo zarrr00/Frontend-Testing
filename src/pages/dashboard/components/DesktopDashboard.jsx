@@ -276,7 +276,7 @@ export default function DesktopDashboard() {
               <CardContent className="p-6">
                 <div className="flex justify-between items-center mb-6">
                    <h3 className="text-sm font-bold text-foreground">Riwayat Transaksi Terbaru</h3>
-                   <span className="text-[11px] font-bold text-primary hover:underline cursor-pointer">Lihat Semua</span>
+                   <Link to="/transactions" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-lg text-xs font-bold shadow-sm">Lihat Semua</Link>
                 </div>
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left">
@@ -304,8 +304,8 @@ export default function DesktopDashboard() {
                           </td>
                           <td className="py-3.5 px-4 text-muted-foreground text-xs font-medium w-1/4">{item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
                           <td className="py-3.5 px-4 text-right">
-                            <span className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold tracking-wide shadow-sm ${item.status === 'Selesai' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
-                              {item.status === 'Selesai' ? "Selesai" : "Tertunda"}
+                            <span className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold tracking-wide shadow-sm ${(!item.status || item.status === 'Selesai') ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
+                              {(!item.status || item.status === 'Selesai') ? "Selesai" : "Tertunda"}
                             </span>
                           </td>
                         </tr>

@@ -13,7 +13,7 @@ export default function TransactionCard({ trx, onDelete }) {
             {isIncome ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
           </div>
           <div>
-            <p className="text-sm font-bold">{trx.name}</p>
+            <p className="text-sm font-bold line-clamp-1">{trx.name || trx.description || trx.action}</p>
             <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground mt-0.5">
               <span className="bg-muted px-1.5 py-0.5 rounded font-medium">{trx.category}</span>
               <Calendar className="w-3 h-3 ml-1" />
@@ -22,13 +22,15 @@ export default function TransactionCard({ trx, onDelete }) {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="text-right flex flex-col items-end">
-            <p className={`text-sm font-bold ${isIncome ? 'text-emerald-500' : 'text-foreground'}`}>
-              {isIncome ? '+' : '-'}{formatIDR(trx.amount)}
+          <div className="text-right flex flex-col items-end justify-center">
+            <p className={`text-sm font-bold whitespace-nowrap ${isIncome ? 'text-emerald-500' : 'text-foreground'}`}>
+              {isIncome ? '+' : '-'} {formatIDR(trx.amount)}
             </p>
-            <p className="text-[10px] text-muted-foreground line-clamp-1 max-w-[120px] mt-0.5 ml-auto">
-              {trx.notes || "-"}
-            </p>
+            {trx.notes && (
+              <p className="text-[10px] text-muted-foreground line-clamp-1 max-w-[120px] mt-0.5 ml-auto">
+                {trx.notes}
+              </p>
+            )}
           </div>
           {onDelete && (
             <button

@@ -4,7 +4,7 @@ import { useConfirm } from '../../../contexts/ConfirmContext';
 import { formatIDR } from '../../../utils/currency';
 import { formatDate } from '../../../utils/date';
 import AnimatedContent from '../../../components/ui/AnimatedContent';
-import { RefreshCw, Plus, ArrowUpCircle, ArrowDownCircle, Calendar, Trash2, X } from 'lucide-react';
+import { RefreshCw, Plus, ArrowUpCircle, ArrowDownCircle, Calendar, Trash2, X, Pencil, Play, Pause } from 'lucide-react';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
@@ -19,30 +19,63 @@ const FREQ_LABEL = {
 export default function MobileRecurring() {
   const { mode } = useMode();
   const { confirmDialog } = useConfirm();
-  const { recurring, loading, error, addRecurring, removeRecurring } = useRecurring();
+  const { recurring, loading, error, addRecurring, editRecurring, removeRecurring } = useRecurring();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalState, setModalState] = useState({ isOpen: false, type: 'create', itemId: null });
   const [formData, setFormData] = useState({ description: '', amount: '', type: 'expense', frequency: 'monthly', next_date: '' });
   const [submitting, setSubmitting] = useState(false);
+
+  const openModal = (type, item = null) => {
+    if (type === 'create') {
+      setFormData({ description: '', amount: '', type: 'expense', frequency: 'monthly', next_date: '' });
+    } else {
+      setFormData({ 
+        description: item.description, 
+        amount: item.amount, 
+        type: item.type, 
+        frequency: item.frequency, 
+        next_date: item.next_date || '' 
+      });
+    }
+    setModalState({ isOpen: true, type, itemId: item ? item.id : null });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.description || !formData.amount || !formData.next_date) return;
     setSubmitting(true);
     try {
-      await addRecurring({
-        ...formData,
-        amount: Number(formData.amount),
-      });
-      toast.success('Transaksi berulang berhasil ditambahkan!');
-      setIsModalOpen(false);
+      if (modalState.type === 'create') {
+        await addRecurring({
+          ...formData,
+          amount: Number(formData.amount),
+        });
+        toast.success('Transaksi berulang berhasil ditambahkan!');
+      } else {
+        await editRecurring(modalState.itemId, {
+          ...formData,
+          amount: Number(formData.amount),
+        });
+        toast.success('Transaksi berulang diperbarui!');
+      }
+      setModalState({ isOpen: false, type: 'create', itemId: null });
       setFormData({ description: '', amount: '', type: 'expense', frequency: 'monthly', next_date: '' });
     } catch (err) {
-      toast.error(typeof err === 'string' ? err : 'Gagal menambahkan langganan');
+      toast.error(typeof err === 'string' ? err : 'Gagal menyimpan otomatisasi');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleToggleStatus = async (item) => {
+    const newStatus = item.status === 'paused' ? 'active' : 'paused';
+    try {
+      await editRecurring(item.id, { status: newStatus });
+      toast.success(newStatus === 'active' ? 'Otomatisasi dilanjutkan!' : 'Otomatisasi berhasil dijeda!');
+    } catch (err) {
+      toast.error('Gagal memperbarui status');
     }
   };
 
@@ -69,7 +102,7 @@ export default function MobileRecurring() {
             <RefreshCw className={`w-6 h-6 text-${accentColor}-600`} />
             <h1 className="text-xl font-bold leading-tight">Transaksi Berulang</h1>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl text-white bg-${accentColor}-600 shadow-lg font-bold`}>
+          <button onClick={() => openModal('create')} className={`w-full flex items-center justify-center gap-2 p-3 rounded-xl text-white bg-${accentColor}-600 shadow-lg font-bold`}>
             <Plus className="w-5 h-5" /> Tambah Transaksi
           </button>
         </div>
@@ -90,7 +123,7 @@ export default function MobileRecurring() {
         <div className="space-y-3">
           {recurring.map((item, i) => (
             <AnimatedContent key={item.id} direction="vertical" delay={100 + i * 60}>
-              <div className="bg-card border border-border rounded-2xl p-4 shadow-sm">
+              <div className={`bg-card border border-border rounded-2xl p-4 shadow-sm transition-all ${item.status === 'paused' ? 'opacity-60 grayscale-[0.5]' : ''}`}>
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-3">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${item.type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
@@ -100,16 +133,21 @@ export default function MobileRecurring() {
                       }
                     </div>
                     <div>
-                      <p className="font-semibold text-sm">{item.description}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-sm">{item.description}</p>
+                        {item.status === 'paused' && (
+                          <span className="text-[9px] uppercase tracking-wider font-bold bg-muted px-1.5 py-0.5 rounded text-muted-foreground border border-border">Dijeda</span>
+                        )}
+                      </div>
                       <p className={`text-xs font-bold ${item.type === 'income' ? 'text-emerald-500' : 'text-red-500'}`}>
                         {formatIDR(item.amount)}
                       </p>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between mt-2">
-                  <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-                    <span className={`px-2 py-0.5 rounded-full font-semibold ${item.type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-red-100 dark:bg-red-900/30 text-red-600'}`}>
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
+                  <div className="flex flex-col gap-1 text-[11px] text-muted-foreground">
+                    <span className={`w-max px-2 py-0.5 rounded-full font-semibold ${item.type === 'income' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-red-100 dark:bg-red-900/30 text-red-600'}`}>
                       {FREQ_LABEL[item.frequency] || item.frequency}
                     </span>
                     {item.next_date && (
@@ -118,9 +156,17 @@ export default function MobileRecurring() {
                       </span>
                     )}
                   </div>
-                  <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <div className="flex items-center gap-1.5">
+                    <button onClick={() => handleToggleStatus(item)} className="p-2 rounded-xl bg-accent text-foreground transition-colors mix-blend-multiply dark:mix-blend-normal" title={item.status === 'paused' ? 'Lanjutkan' : 'Jeda'}>
+                      {item.status === 'paused' ? <Play className="w-4 h-4" /> : <Pause className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => openModal('edit', item)} className="p-2 rounded-xl bg-accent text-foreground transition-colors mix-blend-multiply dark:mix-blend-normal">
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(item.id)} className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors mix-blend-multiply dark:mix-blend-normal">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </AnimatedContent>
@@ -128,15 +174,15 @@ export default function MobileRecurring() {
         </div>
       )}
 
-      {/* Add Recurring Modal (Mobile) */}
-      {isModalOpen && createPortal(
+      {/* Mutli-Purpose Recurring Modal (Mobile) */}
+      {modalState.isOpen && createPortal(
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end justify-center sm:items-center sm:p-4 animate-in fade-in duration-200">
           <div className="w-full sm:max-w-md bg-card border-t sm:border border-border shadow-2xl rounded-t-3xl sm:rounded-2xl animate-in slide-in-from-bottom sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 z-10 bg-card/90 backdrop-blur-md p-4 border-b border-border flex items-center justify-between">
               <div>
-                <h2 className="text-lg font-bold">Otomatisasi Baru</h2>
+                <h2 className="text-lg font-bold">{modalState.type === 'create' ? 'Otomatisasi Baru' : 'Edit Otomatisasi'}</h2>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-full hover:bg-accent text-muted-foreground">
+              <button onClick={() => setModalState({isOpen: false, type: 'create', itemId: null})} className="p-2 rounded-full hover:bg-accent text-muted-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>

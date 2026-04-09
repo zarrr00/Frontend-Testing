@@ -120,7 +120,7 @@ export default function MobileDashboard() {
         <div className="pt-2 pb-6">
           <div className="flex justify-between items-center mb-3 px-1">
             <h2 className="text-sm font-bold">Riwayat Transaksi Terbaru</h2>
-            <Link to="/transactions" className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center">
+            <Link to="/transactions" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-lg text-xs font-bold shadow-sm flex items-center">
               Lihat Semua <ChevronRight className="w-3 h-3 ml-0.5" />
             </Link>
           </div>
