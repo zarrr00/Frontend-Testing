@@ -20,11 +20,12 @@ export const memberService = {
   /**
    * @param {string} profileId - Profile to invite into.
    * @param {string} email - Invitee email address.
+   * @param {string} role - Role of the invitee (editor/viewer).
    * @returns {Promise<Object>} The invitation record.
    */
-  inviteMember: async (profileId, email) => {
+  inviteMember: async (profileId, email, role = 'viewer') => {
     try {
-      const response = await api.post('/members/invite', { email }, { params: { profile_id: profileId } });
+      const response = await api.post('/members/invite', { email, role }, { params: { profile_id: profileId } });
       return response.data.data;
     } catch (error) {
       throw error.response?.data?.message || 'Gagal mengirim undangan';

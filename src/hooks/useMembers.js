@@ -30,8 +30,8 @@ export const useMembers = (initialParams = {}) => {
     fetchMembers();
   }, [fetchMembers]);
 
-  const invite = async (profileId, email) => {
-    const result = await memberService.inviteMember(profileId, email);
+  const invite = async (profileId, email, role = 'viewer') => {
+    const result = await memberService.inviteMember(profileId, email, role);
     await fetchMembers();
     return result;
   };

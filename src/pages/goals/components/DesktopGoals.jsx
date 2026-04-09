@@ -12,30 +12,60 @@ import { toast } from 'sonner';
 export default function DesktopGoals() {
   const { mode } = useMode();
   const { confirmDialog } = useConfirm();
-  const { goals, loading, error, addGoal, removeGoal } = useGoals();
+  const { goals, loading, error, addGoal, editGoal, removeGoal } = useGoals();
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', target_amount: '', deadline: '' });
+  const [modalState, setModalState] = useState({ isOpen: false, type: 'create', goalId: null });
+  const [formData, setFormData] = useState({ name: '', target_amount: '', deadline: '', topup_amount: '' });
   const [submitting, setSubmitting] = useState(false);
+
+  const openModal = (type, goal = null) => {
+    if (type === 'create') {
+      setFormData({ name: '', target_amount: '', deadline: '', topup_amount: '' });
+    } else if (type === 'edit') {
+      setFormData({ name: goal.name, target_amount: goal.target_amount, deadline: goal.deadline || '', topup_amount: '' });
+    } else if (type === 'topup') {
+      setFormData({ name: '', target_amount: '', deadline: '', topup_amount: '' });
+    }
+    setModalState({ isOpen: true, type, goalId: goal ? goal.id : null });
+  };
+
+  const closeModal = () => {
+    setModalState({ isOpen: false, type: 'create', goalId: null });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.target_amount) return;
     setSubmitting(true);
     try {
-      await addGoal({
-        ...formData,
-        target_amount: Number(formData.target_amount),
-        current_amount: 0,
-        deadline: formData.deadline || null
-      });
-      toast.success('Target tabungan berhasil dibuat!');
-      setIsModalOpen(false);
-      setFormData({ name: '', target_amount: '', deadline: '' });
+      if (modalState.type === 'create') {
+        if (!formData.name || !formData.target_amount) return;
+        await addGoal({
+          name: formData.name,
+          target_amount: Number(formData.target_amount),
+          current_amount: 0,
+          deadline: formData.deadline || null
+        });
+        toast.success('Target tabungan berhasil dibuat!');
+      } else if (modalState.type === 'edit') {
+        if (!formData.name || !formData.target_amount) return;
+        await editGoal(modalState.goalId, {
+          name: formData.name,
+          target_amount: Number(formData.target_amount),
+          deadline: formData.deadline || null
+        });
+        toast.success('Target tabungan diperbarui!');
+      } else if (modalState.type === 'topup') {
+        if (!formData.topup_amount) return;
+        const goal = goals.find(g => g.id === modalState.goalId);
+        const newAmount = Number(goal.current_amount || 0) + Number(formData.topup_amount);
+        await editGoal(modalState.goalId, { current_amount: newAmount });
+        toast.success('Saldo tabungan berhasil ditambah!');
+      }
+      closeModal();
     } catch (err) {
-      toast.error(typeof err === 'string' ? err : 'Gagal membuat target');
+      toast.error(typeof err === 'string' ? err : 'Gagal menyimpan data');
     } finally {
       setSubmitting(false);
     }
@@ -65,7 +95,7 @@ export default function DesktopGoals() {
             <h1 className="text-2xl font-bold">Tujuan Keuangan</h1>
           </div>
           <button 
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => openModal('create')}
             className={`flex items-center gap-2 px-4 py-2 rounded-xl text-white text-sm font-semibold bg-${accentColor}-600 hover:bg-${accentColor}-700 transition-colors shadow-lg`}
           >
             <Plus className="w-4 h-4" /> Buat Target
@@ -107,9 +137,14 @@ export default function DesktopGoals() {
                         )}
                       </div>
                     </div>
-                    <button onClick={() => handleDelete(goal.id)} className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-colors">
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex gap-1.5">
+                      <button onClick={() => openModal('edit', goal)} className="p-1.5 rounded-lg border border-transparent hover:border-border hover:bg-accent text-muted-foreground hover:text-foreground transition-all">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-pencil"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></svg>
+                      </button>
+                      <button onClick={() => handleDelete(goal.id)} className="p-1.5 rounded-lg border border-transparent hover:border-red-200 dark:hover:border-red-900 hover:bg-red-50 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-500 transition-all">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* Progress Bar */}
@@ -126,11 +161,19 @@ export default function DesktopGoals() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground bg-accent/50 px-2 py-1 rounded-md">
                       <TrendingUp className="w-3.5 h-3.5" />
-                      <span>{progress}% tercapai</span>
+                      <span className="font-medium">{progress}% tercapai</span>
                     </div>
+                    {progress < 100 && (
+                      <button
+                        onClick={() => openModal('topup', goal)}
+                        className={`text-xs font-bold px-3 py-1.5 rounded-lg bg-${accentColor}-50 dark:bg-${accentColor}-900/20 text-${accentColor}-600 hover:bg-${accentColor}-100 dark:hover:bg-${accentColor}-900/40 transition-colors`}
+                      >
+                        + Top Up
+                      </button>
+                    )}
                   </div>
                 </div>
               </AnimatedContent>
@@ -139,57 +182,79 @@ export default function DesktopGoals() {
         </div>
       )}
 
-      {/* Add Goal Modal */}
-      {isModalOpen && createPortal(
+      {/* Multi-Purpose Modal */}
+      {modalState.isOpen && createPortal(
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="w-full max-w-md bg-card border border-border shadow-2xl rounded-2xl animate-in zoom-in-95 duration-200 overflow-hidden">
             <div className="p-4 border-b border-border flex items-center justify-between bg-muted/30">
               <div>
-                <h2 className="text-lg font-bold">Target Tabungan Baru</h2>
-                <p className="text-xs text-muted-foreground">Tentukan tujuan keuanganmu</p>
+                <h2 className="text-lg font-bold">
+                  {modalState.type === 'create' ? 'Target Tabungan Baru' : modalState.type === 'edit' ? 'Edit Target' : 'Top Up Tabungan'}
+                </h2>
+                <p className="text-xs text-muted-foreground">
+                  {modalState.type === 'create' ? 'Tentukan tujuan keuanganmu' : modalState.type === 'edit' ? 'Perbarui informasi tujuan menabungmu' : 'Berapa banyak yang ingin kamu tabung hari ini?'}
+                </p>
               </div>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 rounded-full hover:bg-accent text-muted-foreground">
+              <button onClick={closeModal} className="p-2 rounded-full hover:bg-accent text-muted-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
+            
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold">Nama Tujuan</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Contoh: Beli Laptop Baru, Liburan..."
-                  value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
+              {modalState.type !== 'topup' ? (
+                <>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold">Nama Tujuan</label>
+                    <input 
+                      type="text" 
+                      required
+                      placeholder="Contoh: Beli Laptop Baru, Liburan..."
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold">Target Jumlah (Rp)</label>
-                <input 
-                  type="number" 
-                  min="0"
-                  required
-                  placeholder="0"
-                  value={formData.target_amount}
-                  onChange={(e) => setFormData({...formData, target_amount: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold">Target Jumlah (Rp)</label>
+                    <input 
+                      type="number" 
+                      min="0"
+                      required
+                      placeholder="0"
+                      value={formData.target_amount}
+                      onChange={(e) => setFormData({...formData, target_amount: e.target.value})}
+                      className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold">Tenggat Waktu <span className="text-muted-foreground font-normal">(Opsional)</span></label>
-                <input 
-                  type="date" 
-                  value={formData.deadline}
-                  onChange={(e) => setFormData({...formData, deadline: e.target.value})}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
-              </div>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-bold">Tenggat Waktu <span className="text-muted-foreground font-normal">(Opsional)</span></label>
+                    <input 
+                      type="date" 
+                      value={formData.deadline}
+                      onChange={(e) => setFormData({...formData, deadline: e.target.value})}
+                      className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-1.5">
+                  <label className="text-sm font-bold">Nominal Top Up (Rp)</label>
+                  <input 
+                    type="number" 
+                    min="1"
+                    required
+                    placeholder="Contoh: 50000"
+                    value={formData.topup_amount}
+                    onChange={(e) => setFormData({...formData, topup_amount: e.target.value})}
+                    className="w-full px-3 py-4 text-center text-lg font-bold rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                  />
+                </div>
+              )}
 
               <div className="pt-2 flex gap-3">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">
+                <button type="button" onClick={closeModal} className="flex-1 py-2.5 rounded-xl border border-border text-sm font-bold hover:bg-accent transition-colors">
                   Batal
                 </button>
                 <button type="submit" disabled={submitting} className={`flex-1 py-2.5 rounded-xl text-white text-sm font-bold bg-${accentColor}-600 hover:bg-${accentColor}-700 transition-colors shadow-lg disabled:opacity-50`}>

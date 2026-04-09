@@ -13,6 +13,7 @@ export default function MobileMembers() {
   const isPersonal = mode === 'personal';
   const accentColor = isPersonal ? 'purple' : 'blue';
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState('viewer');
   const [inviting, setInviting] = useState(false);
 
   const handleInvite = async (e) => {
@@ -20,7 +21,7 @@ export default function MobileMembers() {
     if (!email.trim()) return;
     setInviting(true);
     try {
-      await invite(null, email.trim());
+      await invite(null, email.trim(), role);
       setEmail('');
       toast.success('Undangan terkirim!');
     } catch (err) {
@@ -67,6 +68,14 @@ export default function MobileMembers() {
               required
             />
           </div>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-24 px-2 py-2.5 rounded-xl border border-border bg-card text-xs font-medium focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+          >
+            <option value="viewer">Viewer</option>
+            <option value="editor">Editor</option>
+          </select>
           <button type="submit" disabled={inviting} className={`p-2.5 rounded-xl text-white bg-${accentColor}-600 shadow-lg disabled:opacity-50`}>
             <UserPlus className="w-5 h-5" />
           </button>

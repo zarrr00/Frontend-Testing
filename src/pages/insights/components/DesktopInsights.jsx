@@ -243,7 +243,6 @@ export default function DesktopInsights() {
             </AnimatedContent>
 
             <AnimatedContent distance={40} delay={0.6} direction="vertical" className="flex flex-col h-full">
-              {!isPersonal ? (
                 <Card className="bg-slate-900 text-white shadow-lg border-none relative overflow-hidden flex flex-col justify-between h-full w-full dark:bg-slate-950">
                   <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
                   <CardHeader className="pb-4 relative z-10">
@@ -274,7 +273,36 @@ export default function DesktopInsights() {
                     </div>
                   </CardContent>
                 </Card>
-              ) : (
+            </AnimatedContent>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AnimatedContent distance={40} delay={0.7} direction="vertical" className="flex flex-col h-full">
+              <Card className="bg-card border-border shadow-sm flex flex-col w-full h-full text-foreground">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Receipt className="w-5 h-5 text-muted-foreground" /> Top 5 Expenses
+                  </CardTitle>
+                  <CardDescription className="text-sm">Highest spending this month</CardDescription>
+                </CardHeader>
+                <CardContent className="p-5 pt-0 space-y-3 flex-1">
+                  {topExpenses.map((trx, idx) => (
+                    <div key={trx.id} className="bg-muted/50 border border-border p-4 rounded-xl shadow-sm flex items-center justify-between hover:bg-accent transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-card border border-border text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">{idx + 1}</div>
+                        <div>
+                          <p className="text-sm font-bold line-clamp-1">{getTranslatedCategory(trx.action || trx.name)}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{trx.date}</p>
+                        </div>
+                      </div>
+                      <p className="text-sm font-bold text-rose-600 shrink-0">-{trx.amount}</p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </AnimatedContent>
+
+            <AnimatedContent distance={40} delay={0.8} direction="vertical" className="flex flex-col h-full">
                 <Card className="bg-card border-border shadow-sm flex flex-col h-full w-full text-foreground">
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
                     <div>
@@ -315,79 +343,6 @@ export default function DesktopInsights() {
                     })}
                   </CardContent>
                 </Card>
-              )}
-            </AnimatedContent>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AnimatedContent distance={40} delay={0.7} direction="vertical" className="flex flex-col h-full">
-              <Card className="bg-card border-border shadow-sm flex flex-col w-full h-full text-foreground">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Receipt className="w-5 h-5 text-muted-foreground" /> Top 5 Expenses
-                  </CardTitle>
-                  <CardDescription className="text-sm">Highest spending this month</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 pt-0 space-y-3 flex-1">
-                  {topExpenses.map((trx, idx) => (
-                    <div key={trx.id} className="bg-muted/50 border border-border p-4 rounded-xl shadow-sm flex items-center justify-between hover:bg-accent transition-colors">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full bg-card border border-border text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">{idx + 1}</div>
-                        <div>
-                          <p className="text-sm font-bold line-clamp-1">{getTranslatedCategory(trx.action || trx.name)}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{trx.date}</p>
-                        </div>
-                      </div>
-                      <p className="text-sm font-bold text-rose-600 shrink-0">-{trx.amount}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            </AnimatedContent>
-
-            <AnimatedContent distance={40} delay={0.8} direction="vertical" className="flex flex-col h-full">
-              {isPersonal ? (
-                  <Card className="border-dashed border-2 bg-transparent border-border flex flex-col items-center justify-center p-8 text-center h-full min-h-[250px] shadow-none w-full text-foreground">
-                    <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                      <Target className="w-8 h-8 text-muted-foreground" />
-                    </div>
-                    <h3 className="text-sm font-bold">Watch Your Spending</h3>
-                    <p className="text-xs text-muted-foreground mt-2 max-w-[200px]">Stay within budget this month to reach your savings goals.</p>
-                  </Card>
-              ) : (
-                <Card className="bg-card border-border shadow-sm flex flex-col h-full w-full text-foreground">
-                  <CardHeader className="pb-4 flex flex-row items-center justify-between">
-                    <div>
-                      <CardTitle className="text-base flex items-center gap-2">
-                        <Target className="w-5 h-5 text-rose-500" /> Category Budget
-                      </CardTitle>
-                      <CardDescription className="text-sm">Monitor your category limits.</CardDescription>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
-                      <Plus className="w-3.5 h-3.5" /> Budget
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0 space-y-6 flex-1 overflow-y-auto max-h-[300px]">
-                    {budgets.map((item, idx) => {
-                      const isOver = item.spent > item.limit;
-                      const pct = Math.min((item.spent / item.limit) * 100, 100);
-                      return (
-                        <div key={idx} className="space-y-2">
-                          <div className="flex justify-between text-sm font-bold">
-                            <span>{getTranslatedCategory(item.category)}</span>
-                            <span className={isOver ? "text-rose-600" : "text-muted-foreground"}>
-                              {formatIDR(item.spent)} <span className="opacity-40 font-normal">/ {formatIDR(item.limit)}</span>
-                            </span>
-                          </div>
-                          <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex shrink-0">
-                            <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : item.color}`} style={{ width: `${pct}%` }}></div>
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </CardContent>
-                </Card>
-              )}
             </AnimatedContent>
           </div>
         </div>
