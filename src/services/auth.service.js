@@ -54,6 +54,34 @@ export const authService = {
   },
 
   /**
+   * Update the current user profile (e.g. name, avatar) via API.
+   * @param {Object} data - Form data with full_name and/or avatar_url
+   * @returns {Promise<Object>} The updated user profile data.
+   */
+  updateCurrentUser: async (data) => {
+    try {
+      let payload = data;
+      let headers = {};
+      
+      if (data.avatarFile) {
+        payload = new FormData();
+        if (data.full_name) payload.append('full_name', data.full_name);
+        payload.append('avatar', data.avatarFile);
+        headers = { 'Content-Type': 'multipart/form-data' };
+      }
+
+      const response = await api.put('/auth/me', payload, { headers });
+      if (response.data && response.data.data) {
+        localStorage.setItem('kasflow_user', JSON.stringify(response.data.data));
+        return response.data.data;
+      }
+    } catch (error) {
+      console.error('Failed to update user:', error);
+      throw error;
+    }
+  },
+
+  /**
    * Retrieve cached user profile from localStorage.
    * @returns {Object|null} The cached user or null.
    */

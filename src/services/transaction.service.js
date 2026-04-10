@@ -18,6 +18,20 @@ export const transactionService = {
   },
 
   /**
+   * Fetch total transaction count for current profile.
+   * @returns {Promise<number>} Total transactions.
+   */
+  getTotalCount: async () => {
+    try {
+      const response = await api.get('/transactions', { params: { limit: 1 } });
+      return response.data.pagination?.total || 0;
+    } catch (error) {
+      console.error('Failed to get transactions count:', error);
+      return 0;
+    }
+  },
+
+  /**
    * @param {Object} transactionData - Transaction payload (type, amount, description, etc.).
    * @returns {Promise<Object>} The newly created transaction.
    */

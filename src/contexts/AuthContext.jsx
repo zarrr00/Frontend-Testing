@@ -43,6 +43,11 @@ export const AuthProvider = ({ children }) => {
   const loginWithGithub = () => authService.loginWithGithub();
   const handleCallback = (hash) => authService.handleOauthCallback(hash);
 
+  const updateUser = async (data) => {
+    const updatedUser = await authService.updateCurrentUser(data);
+    setUser(updatedUser);
+  };
+
   const logout = () => {
     authService.logout();
     setUser(null);
@@ -56,6 +61,7 @@ export const AuthProvider = ({ children }) => {
     loginWithGoogle,
     loginWithGithub,
     handleCallback,
+    updateUser,
     logout,
   };
 
