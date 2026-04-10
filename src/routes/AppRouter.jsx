@@ -12,6 +12,7 @@ const AddTransaction = lazy(() => import('../pages/add-transaction'));
 const Insights = lazy(() => import('../pages/insights'));
 const Profile = lazy(() => import('../pages/profile'));
 const Settings = lazy(() => import('../pages/profile/settings'));
+const AboutKasflow = lazy(() => import('../pages/profile/about'));
 const Gamification = lazy(() => import('../pages/gamification'));
 
 // New feature pages
@@ -48,6 +49,7 @@ export default function AppRouter() {
             <Route path="/gamification" element={<Gamification />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/settings" element={<Settings />} />
+            <Route path="/profile/about" element={<AboutKasflow />} />
             {/* Fitur baru */}
             <Route path="/debts" element={<Debts />} />
             <Route path="/goals" element={<Goals />} />

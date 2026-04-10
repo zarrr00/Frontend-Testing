@@ -175,20 +175,13 @@ export default function DesktopProfile() {
                 <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">{"Bantuan"}</CardTitle>
               </CardHeader>
               <div className="flex flex-col divide-y divide-border flex-1">
-                <button className="flex items-center justify-between p-6 hover:bg-accent transition text-left group flex-1">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl bg-muted group-hover:scale-110 transition-transform"><CircleHelp className="w-5 h-5 text-blue-600 dark:text-blue-400" /></div>
-                    <p className="text-base font-bold">{"Aduan & FAQ"}</p>
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
-                <button className="flex items-center justify-between p-6 hover:bg-accent transition text-left group flex-1">
+                <Link to="/profile/about" className="flex items-center justify-between p-6 hover:bg-accent transition text-left group flex-1">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-xl bg-muted group-hover:scale-110 transition-transform"><CircleHelp className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /></div>
                     <p className="text-base font-bold">{"Tentang KasFlow"}</p>
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
-                </button>
+                </Link>
               </div>
             </Card>
           </div>

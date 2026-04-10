@@ -252,18 +252,7 @@ export default function MobileProfile() {
           </h3>
           <Card className="border-border bg-card shadow-sm overflow-hidden">
             <div className="flex flex-col divide-y divide-border text-foreground">
-              <button className="flex items-center justify-between p-4 hover:bg-accent transition text-left">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-muted">
-                    <CircleHelp className="w-4 h-4" />
-                  </div>
-                  <p className="text-sm font-bold">
-                    {"Aduan & FAQ"}
-                  </p>
-                </div>
-                <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </button>
-              <button className="flex items-center justify-between p-4 hover:bg-accent transition text-left">
+              <Link to="/profile/about" className="flex items-center justify-between p-4 hover:bg-accent transition text-left">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-lg bg-muted">
                     <CircleHelp className="w-4 h-4" />
@@ -273,7 +262,7 @@ export default function MobileProfile() {
                   </p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              </button>
+              </Link>
             </div>
           </Card>
         </div>
