@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUpRight, ArrowDownRight, Scan, Plus, Search, Bell, Settings, TrendingUp, Wallet, ChevronRight } from "lucide-react";
 import SparklineChart from "@/components/charts/SparklineChart";
 import CashFlowAreaChart from "@/components/charts/CashFlowAreaChart";
@@ -10,7 +9,20 @@ import { formatIDR } from "@/utils/currency";
 import { transactionService } from "@/services/transaction.service";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedContent from "@/components/ui/AnimatedContent";
+import BorderGlow from "@/components/ui/BorderGlow";
 import { toast } from "sonner";
+
+const GLOW = {
+  edgeSensitivity: 30,
+  glowColor: '40 80 80',
+  backgroundColor: '#060010',
+  borderRadius: 20,
+  glowRadius: 80,
+  glowIntensity: 3,
+  coneSpread: 45,
+  animated: false,
+  colors: ['#c084fc', '#f472b6', '#38bdf8'],
+};
 
 export default function DesktopDashboard() {
   const navigate = useNavigate();
@@ -102,11 +114,11 @@ export default function DesktopDashboard() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <AnimatedContent distance={40} delay={0.2}>
-              <Card className="bg-card border-border shadow-sm relative overflow-hidden group">
-                <CardContent className="p-5">
+              <BorderGlow {...GLOW}>
+                <div className="p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Total Saldo Aktif</span>
-                    <Wallet className="w-4 h-4 text-primary" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Total Saldo Aktif</span>
+                    <Wallet className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="flex items-end justify-between">
                     <div>
@@ -120,14 +132,14 @@ export default function DesktopDashboard() {
                       <SparklineChart data={sparklineBalance} color="var(--primary)" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
             <AnimatedContent distance={40} delay={0.3}>
-              <Card className="bg-card border-border shadow-sm relative overflow-hidden group">
-                <CardContent className="p-5">
+              <BorderGlow {...GLOW}>
+                <div className="p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pemasukan</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pemasukan</span>
                     <ArrowUpRight className="w-4 h-4 text-emerald-500" />
                   </div>
                   <div className="flex items-end justify-between">
@@ -142,14 +154,14 @@ export default function DesktopDashboard() {
                        <SparklineChart data={sparklineIncome} color="#10b981" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
             <AnimatedContent distance={40} delay={0.4}>
-              <Card className="bg-card border-border shadow-sm relative overflow-hidden group">
-                <CardContent className="p-5">
+              <BorderGlow {...GLOW}>
+                <div className="p-5">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Pengeluaran</span>
+                    <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Pengeluaran</span>
                     <ArrowDownRight className="w-4 h-4 text-rose-500" />
                   </div>
                   <div className="flex items-end justify-between">
@@ -164,19 +176,19 @@ export default function DesktopDashboard() {
                        <SparklineChart data={sparklineExpense} color="#f43f5e" />
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
           </div>
 
           {/* Charts Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1">
             <AnimatedContent distance={40} delay={0.5} className="lg:col-span-2 flex flex-col h-full">
-              <Card className="bg-card border-border shadow-sm lg:col-span-2 flex flex-col w-full h-full">
-                <CardContent className="p-6 flex flex-col flex-1">
+              <BorderGlow {...GLOW} className="flex-1">
+                <div className="p-6 flex flex-col flex-1">
                   <div className="flex justify-between items-center mb-6 shrink-0">
-                    <h3 className="text-sm font-bold text-foreground">Tren Arus Kas</h3>
-                    <div className="flex gap-4 text-xs font-bold text-muted-foreground">
+                    <h3 className="text-sm font-bold">Tren Arus Kas</h3>
+                    <div className="flex gap-4 text-xs font-bold text-slate-400">
                       <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-emerald-500 shadow-sm"></div>Pemasukan</span>
                       <span className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-rose-500 shadow-sm"></div>Pengeluaran</span>
                     </div>
@@ -184,13 +196,13 @@ export default function DesktopDashboard() {
                   <div className="w-full flex-1 min-h-[220px]">
                       <CashFlowAreaChart data={chartData} />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
             <AnimatedContent distance={40} delay={0.6} className="lg:col-span-1 flex flex-col h-full">
-              <Card className="bg-card border-border shadow-sm lg:col-span-1 flex flex-col w-full h-full">
-                <CardContent className="p-6 flex flex-col flex-1">
-                  <h3 className="text-sm font-bold text-foreground mb-6 shrink-0">Distribusi Kategori</h3>
+              <BorderGlow {...GLOW} className="flex-1">
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-sm font-bold mb-6 shrink-0">Distribusi Kategori</h3>
                   <div className="w-full relative flex-1 min-h-[160px]">
                       <CategoryPieChart data={categoryData} />
                   </div>
@@ -199,14 +211,14 @@ export default function DesktopDashboard() {
                       <div key={i} className="flex items-center justify-between text-xs font-medium">
                         <div className="flex items-center gap-2">
                            <div className="w-2.5 h-2.5 rounded-full shadow-sm" style={{backgroundColor: cat.color}}></div>
-                           <span className="text-foreground">{cat.name}</span>
+                           <span>{cat.name}</span>
                         </div>
-                        <span className="font-bold text-foreground">{cat.value}%</span>
+                        <span className="font-bold">{cat.value}%</span>
                       </div>
                     ))}
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
           </div>
         </div>
@@ -214,73 +226,73 @@ export default function DesktopDashboard() {
         {/* Right Sidebar */}
         <div className="xl:col-span-1 flex flex-col gap-6">
           <AnimatedContent distance={40} delay={0.3} direction="vertical">
-            <Card className="bg-card border-border shadow-sm overflow-hidden shrink-0">
-              <div className="p-4 bg-muted/30 border-b border-border flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Aksi Cepat</span>
-                <Settings className="w-4 h-4 text-muted-foreground cursor-pointer hover:text-foreground transition-colors" />
+            <BorderGlow {...GLOW}>
+              <div className="p-4 border-b border-white/10 flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Aksi Cepat</span>
+                <Settings className="w-4 h-4 text-slate-400 cursor-pointer hover:text-white transition-colors" />
               </div>
-              <CardContent className="p-4 flex flex-col gap-3">
-                <Link to="/add" state={{type: 'income'}} className="flex items-center gap-3 p-3.5 bg-background border border-border shadow-sm rounded-xl hover:bg-accent transition-colors group cursor-pointer">
+              <div className="p-4 flex flex-col gap-3">
+                <Link to="/add" state={{type: 'income'}} className="flex items-center gap-3 p-3.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer">
                    <div className="bg-emerald-500/10 p-2 rounded-lg group-hover:bg-emerald-500/20 transition-colors">
                       <Plus className="w-4 h-4 text-emerald-500" />
                    </div>
-                   <span className="text-sm font-bold text-foreground">Tambah Pemasukan</span>
+                   <span className="text-sm font-bold">Tambah Pemasukan</span>
                 </Link>
-                <Link to="/add" state={{type: 'expense'}} className="flex items-center gap-3 p-3.5 bg-background border border-border shadow-sm rounded-xl hover:bg-accent transition-colors group cursor-pointer">
+                <Link to="/add" state={{type: 'expense'}} className="flex items-center gap-3 p-3.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer">
                    <div className="bg-rose-500/10 p-2 rounded-lg group-hover:bg-rose-500/20 transition-colors">
                       <ArrowDownRight className="w-4 h-4 text-rose-500" />
                    </div>
-                   <span className="text-sm font-bold text-foreground">Tambah Pengeluaran</span>
+                   <span className="text-sm font-bold">Tambah Pengeluaran</span>
                 </Link>
-                <button onClick={handleScanClick} disabled={isScanning} className="flex items-center gap-3 p-3.5 bg-background border border-border shadow-sm rounded-xl hover:bg-accent transition-colors group cursor-pointer w-full text-left">
+                <button onClick={handleScanClick} disabled={isScanning} className="flex items-center gap-3 p-3.5 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer w-full text-left">
                    <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
                    <div className="bg-blue-500/10 p-2 rounded-lg group-hover:bg-blue-500/20 transition-colors">
                       <Scan className={`w-4 h-4 text-blue-500 ${isScanning ? "animate-spin" : ""}`} />
                    </div>
-                   <span className="text-sm font-bold text-foreground">{isScanning ? "Memindai..." : "Scan Struk / Nota"}</span>
+                   <span className="text-sm font-bold">{isScanning ? "Memindai..." : "Scan Struk / Nota"}</span>
                 </button>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
           <AnimatedContent distance={40} delay={0.5} direction="vertical" className="flex-1 flex flex-col min-h-[220px]">
-            <Card className="bg-card border-border shadow-sm overflow-hidden flex-1 flex flex-col h-full w-full">
-              <div className="p-4 bg-muted/30 border-b border-border flex items-center justify-between shrink-0">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Kesehatan Finansial</span>
-                <TrendingUp className="w-4 h-4 text-muted-foreground" />
+            <BorderGlow {...GLOW} className="flex-1">
+              <div className="p-4 border-b border-white/10 flex items-center justify-between shrink-0">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">Kesehatan Finansial</span>
+                <TrendingUp className="w-4 h-4 text-slate-400" />
               </div>
-              <CardContent className="p-5 flex flex-col justify-center flex-1 gap-4">
+              <div className="p-5 flex flex-col justify-center flex-1 gap-4">
                 <div className="flex justify-between items-end">
                   <div>
-                    <h4 className="text-sm font-black text-foreground">{healthLabel}</h4>
-                    <p className="text-[11px] font-medium text-muted-foreground mt-0.5">{healthScore >= 50 ? 'Pengeluaran terkendali' : 'Perlu perhatian'}</p>
+                    <h4 className="text-sm font-black">{healthLabel}</h4>
+                    <p className="text-[11px] font-medium text-slate-400 mt-0.5">{healthScore >= 50 ? 'Pengeluaran terkendali' : 'Perlu perhatian'}</p>
                   </div>
                   <span className={`text-3xl font-black tracking-tighter ${healthScore >= 75 ? 'text-emerald-500' : healthScore >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>{healthScore}<span className="text-xl">%</span></span>
                 </div>
-                <div className="relative w-full h-3.5 bg-muted rounded-full overflow-hidden shadow-inner mt-2">
+                <div className="relative w-full h-3.5 bg-white/10 rounded-full overflow-hidden shadow-inner mt-2">
                   <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-rose-500 via-amber-400 to-emerald-500 rounded-full transition-all duration-1000" style={{ width: `${healthScore}%` }}></div>
                 </div>
-                <div className="flex justify-between text-[10px] font-bold text-muted-foreground px-1 uppercase tracking-wider mt-1">
+                <div className="flex justify-between text-[10px] font-bold text-slate-500 px-1 uppercase tracking-wider mt-1">
                   <span>Kritis</span>
                   <span>Waspada</span>
                   <span>Aman</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
         </div>
 
         {/* Recent Transactions Table */}
         <div className="xl:col-span-4 mt-2">
           <AnimatedContent distance={30} delay={0.7} direction="vertical">
-            <Card className="bg-card border-border shadow-sm">
-              <CardContent className="p-6">
+            <BorderGlow {...GLOW}>
+              <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                   <h3 className="text-sm font-bold text-foreground">Riwayat Transaksi Terbaru</h3>
-                   <Link to="/transactions" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors rounded-lg text-xs font-bold shadow-sm">Lihat Semua</Link>
+                   <h3 className="text-sm font-bold">Riwayat Transaksi Terbaru</h3>
+                   <Link to="/transactions" className="px-3 py-1.5 bg-blue-600 text-white hover:bg-blue-500 transition-colors rounded-lg text-xs font-bold shadow-sm">Lihat Semua</Link>
                 </div>
                 <div className="overflow-x-auto w-full">
                   <table className="w-full text-sm text-left">
-                    <thead className="text-[11px] uppercase tracking-wider text-muted-foreground border-b border-border">
+                    <thead className="text-[11px] uppercase tracking-wider text-slate-400 border-b border-white/10">
                       <tr>
                         <th className="pb-3 font-bold px-4">Tipe Transaksi</th>
                         <th className="pb-3 font-bold px-4">Kategori &amp; Aktivitas</th>
@@ -290,19 +302,19 @@ export default function DesktopDashboard() {
                     </thead>
                     <tbody>
                       {recentActivity.map((item) => (
-                        <tr key={item.id} className="border-b border-border hover:bg-accent/50 transition-colors">
+                        <tr key={item.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                           <td className="py-3.5 px-4 w-1/4">
                             <div className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shadow-sm ${item.type === 'income' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
                                 {item.type === 'income' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
                               </div>
-                              <span className="text-foreground font-bold">{item.type === 'income' ? "Pemasukan" : "Pengeluaran"}</span>
+                              <span className="font-bold">{item.type === 'income' ? "Pemasukan" : "Pengeluaran"}</span>
                             </div>
                           </td>
-                          <td className="py-3.5 px-4 text-muted-foreground font-medium w-1/3">
+                          <td className="py-3.5 px-4 text-slate-400 font-medium w-1/3">
                             {item.category_name || item.description || getTranslatedAction(item.action)}
                           </td>
-                          <td className="py-3.5 px-4 text-muted-foreground text-xs font-medium w-1/4">{item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
+                          <td className="py-3.5 px-4 text-slate-400 text-xs font-medium w-1/4">{item.date ? new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
                           <td className="py-3.5 px-4 text-right">
                             <span className={`px-2.5 py-1.5 rounded-full text-[10px] font-bold tracking-wide shadow-sm ${(!item.status || item.status === 'Selesai') ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
                               {(!item.status || item.status === 'Selesai') ? "Selesai" : "Tertunda"}
@@ -313,8 +325,8 @@ export default function DesktopDashboard() {
                     </tbody>
                   </table>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import { Card, CardContent } from "@/components/ui/card";
 import {
   ArrowUpRight,
   ArrowDownRight,
@@ -15,6 +14,19 @@ import { formatIDR } from "@/utils/currency";
 import { formatDate } from "@/utils/date";
 import { useAuth } from "@/contexts/AuthContext";
 import AnimatedContent from "@/components/ui/AnimatedContent";
+import BorderGlow from "@/components/ui/BorderGlow";
+
+const GLOW = {
+  edgeSensitivity: 30,
+  glowColor: '40 80 80',
+  backgroundColor: '#060010',
+  borderRadius: 16,
+  glowRadius: 60,
+  glowIntensity: 3,
+  coneSpread: 45,
+  animated: false,
+  colors: ['#c084fc', '#f472b6', '#38bdf8'],
+};
 
 export default function MobileDashboard() {
   const { mode } = useMode();
@@ -48,56 +60,60 @@ export default function MobileDashboard() {
 
       {/* Balance Card */}
       <AnimatedContent distance={40} delay={0.2} direction="vertical">
-        <Card className="bg-slate-900 text-white border-none shadow-xl overflow-hidden rounded-2xl relative">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
-          <CardContent className="p-5 relative z-10">
+        <BorderGlow {...GLOW}>
+          <div className="p-5 relative z-10">
             <div className="flex items-center gap-2 text-slate-400 mb-2">
               <Wallet className="w-4 h-4" />
               <span className="text-xs font-medium uppercase tracking-wider">Total Saldo Aktif</span>
             </div>
             <div className="text-3xl font-extrabold tracking-tight mb-5">{formatIDR(summary.balance)}</div>
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-700/50">
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/10">
               <div>
                 <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 mb-1">
                   <div className="bg-emerald-500/20 p-1 rounded-full"><ArrowUpRight className="w-3 h-3 text-emerald-400" /></div>
                   PEMASUKAN
                 </div>
-                <div className="text-sm font-bold text-slate-100">{formatIDR(summary.total_income)}</div>
+                <div className="text-sm font-bold">{formatIDR(summary.total_income)}</div>
               </div>
               <div>
                 <div className="flex items-center gap-1.5 text-[10px] font-medium text-slate-400 mb-1">
                   <div className="bg-rose-500/20 p-1 rounded-full"><ArrowDownRight className="w-3 h-3 text-rose-400" /></div>
                   PENGELUARAN
                 </div>
-                <div className="text-sm font-bold text-slate-100">{formatIDR(summary.total_expense)}</div>
+                <div className="text-sm font-bold">{formatIDR(summary.total_expense)}</div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </BorderGlow>
       </AnimatedContent>
 
       {/* Quick Actions */}
       <AnimatedContent distance={40} delay={0.3} direction="vertical">
         <div className="grid grid-cols-3 gap-3">
-          <Link to="/add" state={{ type: 'income' }} className="flex flex-col items-center justify-center p-3 bg-card border border-border rounded-2xl shadow-sm hover:bg-accent active:scale-95 transition-all group">
-            <div className="bg-emerald-500/10 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform">
-              <ArrowUpRight className="w-5 h-5 text-emerald-600" />
-            </div>
-            <span className="text-[10px] font-bold">Pemasukan</span>
-          </Link>
-          <Link to="/add" state={{ type: 'expense' }} className="flex flex-col items-center justify-center p-3 bg-card border border-border rounded-2xl shadow-sm hover:bg-accent active:scale-95 transition-all group">
-            <div className="bg-rose-500/10 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform">
-              <ArrowDownRight className="w-5 h-5 text-rose-600" />
-            </div>
-            <span className="text-[10px] font-bold">Pengeluaran</span>
-          </Link>
-          <button className="flex flex-col items-center justify-center p-3 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl shadow-md shadow-blue-500/30 active:scale-95 transition-all group relative overflow-hidden border-none">
-            <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-b-full"></div>
-            <div className="bg-white/20 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform relative z-10">
-              <Scan className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-[10px] font-bold text-white relative z-10">Scan Struk / Nota</span>
-          </button>
+          <BorderGlow {...GLOW} borderRadius={16}>
+            <Link to="/add" state={{ type: 'income' }} className="flex flex-col items-center justify-center p-3 group">
+              <div className="bg-emerald-500/10 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform">
+                <ArrowUpRight className="w-5 h-5 text-emerald-400" />
+              </div>
+              <span className="text-[10px] font-bold">Pemasukan</span>
+            </Link>
+          </BorderGlow>
+          <BorderGlow {...GLOW} borderRadius={16}>
+            <Link to="/add" state={{ type: 'expense' }} className="flex flex-col items-center justify-center p-3 group">
+              <div className="bg-rose-500/10 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform">
+                <ArrowDownRight className="w-5 h-5 text-rose-400" />
+              </div>
+              <span className="text-[10px] font-bold">Pengeluaran</span>
+            </Link>
+          </BorderGlow>
+          <BorderGlow {...GLOW} borderRadius={16} colors={['#3b82f6', '#6366f1', '#8b5cf6']}>
+            <button className="flex flex-col items-center justify-center p-3 group w-full">
+              <div className="bg-blue-500/20 p-2 rounded-full mb-2 group-hover:scale-110 transition-transform">
+                <Scan className="w-5 h-5 text-blue-400" />
+              </div>
+              <span className="text-[10px] font-bold">Scan Struk</span>
+            </button>
+          </BorderGlow>
         </div>
       </AnimatedContent>
 
@@ -105,13 +121,13 @@ export default function MobileDashboard() {
       <AnimatedContent distance={40} delay={0.4} direction="vertical">
         <div className="space-y-3">
           <h2 className="text-sm font-bold px-1">Tren Arus Kas</h2>
-          <Card className="bg-card border-border shadow-sm rounded-xl overflow-hidden">
-            <CardContent className="p-0 pt-4 pb-0 px-0">
+          <BorderGlow {...GLOW}>
+            <div className="pt-4">
               <div className="h-[200px] w-full">
                 <CashFlowAreaChart data={mobileChartData} isMobile={true} />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </BorderGlow>
         </div>
       </AnimatedContent>
 
@@ -127,22 +143,24 @@ export default function MobileDashboard() {
           <div className="space-y-2">
             {recentActivity.map((trx, i) => (
               <AnimatedContent key={trx.id} distance={20} delay={0.5 + (i * 0.1)} direction="vertical">
-                <div className="bg-card border border-border p-3 rounded-xl shadow-sm flex items-center justify-between hover:bg-accent transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-full ${trx.type === 'income' ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
-                      {trx.type === 'income' ? <ArrowUpRight className="w-4 h-4 text-emerald-600" /> : <ArrowDownRight className="w-4 h-4 text-rose-600" />}
-                    </div>
-                    <div>
-                      <p className="text-xs font-bold">{trx.category_name || trx.description || trx.action}</p>
-                      <div className="flex items-center gap-1 text-[10px] text-muted-foreground mt-0.5">
-                        <Calendar className="w-3 h-3" /> {formatDate(trx.date || trx.dateISO)}
+                <BorderGlow {...GLOW}>
+                  <div className="p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-full ${trx.type === 'income' ? 'bg-emerald-500/10' : 'bg-rose-500/10'}`}>
+                        {trx.type === 'income' ? <ArrowUpRight className="w-4 h-4 text-emerald-400" /> : <ArrowDownRight className="w-4 h-4 text-rose-400" />}
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold">{trx.category_name || trx.description || trx.action}</p>
+                        <div className="flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                          <Calendar className="w-3 h-3" /> {formatDate(trx.date || trx.dateISO)}
+                        </div>
                       </div>
                     </div>
+                    <p className={`text-xs font-bold ${trx.type === 'income' ? 'text-emerald-400' : 'text-white'}`}>
+                      {trx.type === 'income' ? '+' : '-'}{formatIDR(trx.amount)}
+                    </p>
                   </div>
-                  <p className={`text-xs font-bold ${trx.type === 'income' ? 'text-emerald-600' : 'text-foreground'}`}>
-                    {trx.type === 'income' ? '+' : '-'}{formatIDR(trx.amount)}
-                  </p>
-                </div>
+                </BorderGlow>
               </AnimatedContent>
             ))}
           </div>

@@ -14,12 +14,24 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import AnimatedContent from "@/components/ui/AnimatedContent";
+import BorderGlow from "@/components/ui/BorderGlow";
+
+const GLOW = {
+  edgeSensitivity: 30,
+  glowColor: '40 80 80',
+  backgroundColor: '#060010',
+  borderRadius: 20,
+  glowRadius: 80,
+  glowIntensity: 3,
+  coneSpread: 45,
+  animated: false,
+  colors: ['#c084fc', '#f472b6', '#38bdf8'],
+};
+
 export default function MobileInsights() {
   const { mode } = useMode(); 
   const { summary, chartData, categoryData, recentActivity, loading } = useDashboardData();
   const isPersonal = mode === 'personal';
-  const themeColor = isPersonal ? 'text-purple-600' : 'text-blue-600';
-  const themeBg = isPersonal ? 'bg-purple-100 dark:bg-purple-900/20' : 'bg-blue-100 dark:bg-blue-900/20';
   const activeData = categoryData.length > 0 ? categoryData : [{ name: 'Belum ada data', value: 100, color: '#cbd5e1' }];
   const totalExpense = summary.total_expense || 0;
   // Trend Data
@@ -118,56 +130,53 @@ export default function MobileInsights() {
         <div className="space-y-6 flex flex-col h-full">
           {/* Insight Card */}
           <AnimatedContent distance={40} delay={0.2} direction="vertical">
-            <Card className={`${themeBg} border-none shadow-sm`}>
-              <CardContent className="p-5 flex gap-4 items-start">
-                <Lightbulb className={`w-6 h-6 shrink-0 mt-0.5 ${themeColor}`} />
+            <BorderGlow {...GLOW} colors={isPersonal ? ['#a855f7', '#c084fc', '#e879f9'] : ['#3b82f6', '#6366f1', '#38bdf8']}>
+              <div className="p-5 flex gap-4 items-start">
+                <Lightbulb className={`w-6 h-6 shrink-0 mt-0.5 ${isPersonal ? 'text-purple-400' : 'text-blue-400'}`} />
                 <div>
-                  <h3 className={`text-base font-bold ${themeColor} mb-2`}>{"Insight Cerdas"}</h3>
-                  <p className="text-sm opacity-90 leading-relaxed text-foreground">
-                    {"Pengeluaran terbesarmu bulan ini ada di kategori"} <span className="font-bold">{getTranslatedCategory(activeData[0].name)}</span>. 
+                  <h3 className={`text-base font-bold ${isPersonal ? 'text-purple-400' : 'text-blue-400'} mb-2`}>{"Insight Cerdas"}</h3>
+                  <p className="text-sm opacity-90 leading-relaxed text-slate-300">
+                    {"Pengeluaran terbesarmu bulan ini ada di kategori"} <span className="font-bold text-white">{getTranslatedCategory(activeData[0].name)}</span>. 
                     {isPersonal ? ` ${"Coba kurangi jajan di luar untuk berhemat."}` : ` ${"Pastikan harga jual produkmu sudah menutupi modal ini."}`}
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
           {/* Donut Chart */}
           <AnimatedContent distance={40} delay={0.3} direction="vertical" className="flex flex-col flex-1 min-h-[350px]">
-            <Card className="bg-card border-border shadow-sm overflow-hidden flex flex-col h-full w-full">
-              <CardHeader className="pb-0 shrink-0">
-                <CardTitle className="text-base text-foreground">{"Distribusi Kategori"}</CardTitle>
-                <CardDescription className="text-sm text-muted-foreground">
+            <BorderGlow {...GLOW} className="flex-1">
+              <div className="p-6 flex flex-col flex-1">
+                <h3 className="text-base font-bold">{"Distribusi Kategori"}</h3>
+                <p className="text-sm text-slate-400 mt-1">
                   {"Berdasarkan pengeluaran"} Rp{(totalExpense/1000000).toFixed(1)} Juta
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="p-0 flex flex-col items-center flex-1 justify-center">
+                </p>
                 <div className="h-[220px] w-full mt-4">
                   <DistributionPieChart data={activeData} />
                 </div>
-                <div className="w-full px-6 pb-6 space-y-3 mt-4">
+                <div className="w-full space-y-3 mt-4">
                   {activeData.map((item, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                        <span className="text-sm font-medium text-muted-foreground">{getTranslatedCategory(item.name)}</span>
+                        <span className="text-sm font-medium text-slate-400">{getTranslatedCategory(item.name)}</span>
                       </div>
                       <div className="flex items-center gap-4">
-                        <span className="text-sm font-bold text-foreground">{formatIDR(item.value)}</span>
-                        <span className="text-xs text-muted-foreground font-bold w-12 text-right">
+                        <span className="text-sm font-bold">{formatIDR(item.value)}</span>
+                        <span className="text-xs text-slate-500 font-bold w-12 text-right">
                           {Math.round((item.value / totalExpense) * 100)}%
                         </span>
                       </div>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
           {/* Gamification Card */}
           <AnimatedContent distance={40} delay={0.4} direction="vertical" className="shrink-0">
-            <Card className="border-none shadow-sm relative overflow-hidden bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 w-full text-foreground">
-              <div className="absolute -right-4 -top-4 w-20 h-20 bg-amber-400/20 rounded-full blur-2xl"></div>
-              <CardContent className="p-5 flex flex-col gap-4 relative z-10">
+            <BorderGlow {...GLOW} colors={['#f59e0b', '#f97316', '#fbbf24']}>
+              <div className="p-5 flex flex-col gap-4 relative z-10">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="p-2.5 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 shadow-sm">
@@ -175,22 +184,22 @@ export default function MobileInsights() {
                     </div>
                     <div>
                       <h3 className="text-sm font-bold">{"Master Finansial"}</h3>
-                      <p className="text-xs font-semibold text-amber-600 flex items-center gap-1">Level 4 <Sparkles className="w-3 h-3" /></p>
+                      <p className="text-xs font-semibold text-amber-400 flex items-center gap-1">Level 4 <Sparkles className="w-3 h-3" /></p>
                     </div>
                   </div>
-                  <div className="text-right text-muted-foreground">
-                    <span className="text-xs font-bold text-foreground">850 XP</span>
-                    <p className="text-[10px]">{"ke Level 5"}</p>
+                  <div className="text-right">
+                    <span className="text-xs font-bold">850 XP</span>
+                    <p className="text-[10px] text-slate-400">{"ke Level 5"}</p>
                   </div>
                 </div>
                 <div className="space-y-1.5">
-                  <div className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner flex">
+                  <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden shadow-inner flex">
                     <div className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full" style={{ width: '70%' }}></div>
                   </div>
-                  <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">{"Hebat! Pengeluaranmu 15% lebih irit bulan ini (+50 XP). Terus pertahankan!"}</p>
+                  <p className="text-[10px] text-slate-400 font-medium leading-relaxed">{"Hebat! Pengeluaranmu 15% lebih irit bulan ini (+50 XP). Terus pertahankan!"}</p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </BorderGlow>
           </AnimatedContent>
         </div>
         {/* Kolom Kanan */}
@@ -198,101 +207,99 @@ export default function MobileInsights() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Trend Chart */}
             <AnimatedContent distance={40} delay={0.5} direction="vertical" className="flex flex-col h-full">
-              <Card className="bg-card border-border shadow-sm flex flex-col h-full w-full text-foreground">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex justify-between items-center">
-                    <span>{"Tren Arus Kas"}</span>
-                    <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-100 dark:bg-emerald-900/40 px-2.5 py-1 rounded-full">
+              <BorderGlow {...GLOW} className="flex-1">
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-base font-bold">{"Tren Arus Kas"}</h3>
+                    <div className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full">
                       <TrendingDown className="w-3.5 h-3.5" /> 15% {"Lebih Hemat"}
                     </div>
-                  </CardTitle>
-                  <CardDescription className="text-sm">{"Bulan ini vs Bulan lalu"}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 flex-1 flex flex-col justify-center">
-                  <div className="h-[220px] w-full">
-                      <TrendBarChart data={trendData} />
                   </div>
-                </CardContent>
-              </Card>
+                  <p className="text-sm text-slate-400 mb-4">{"Bulan ini vs Bulan lalu"}</p>
+                  <div className="h-[220px] w-full flex-1">
+                    <TrendBarChart data={trendData} />
+                  </div>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
-            {/* Budget Card */}
+            {/* Monthly Report Card */}
             <AnimatedContent distance={40} delay={0.6} direction="vertical" className="flex flex-col h-full">
-                <Card className="bg-slate-900 text-white shadow-lg border-none relative overflow-hidden flex flex-col justify-between h-full w-full dark:bg-slate-950">
-                  <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
-                  <CardHeader className="pb-4 relative z-10">
-                    <div className="flex justify-between items-center">
-                      <CardTitle className="text-base flex items-center gap-2 text-white">
-                        <FileText className="w-5 h-5 text-blue-400" />
-                        {"Laporan Bulanan"}
-                      </CardTitle>
-                      <CardDescription className="text-xs font-medium text-slate-400">
-                        {new Date().toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}
-                      </CardDescription>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-6 pt-0 space-y-6 relative z-10 flex-1 flex flex-col justify-between">
-                    <div className="grid grid-cols-2 gap-4 border-b border-slate-700/50 pb-5">
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">{"Pemasukan"}</p>
-                        <p className="text-lg font-black text-emerald-400">{formatIDR(summary.total_income)}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">{"Pengeluaran"}</p>
-                        <p className="text-lg font-black text-rose-400">{formatIDR(summary.total_expense)}</p>
-                      </div>
+              <BorderGlow {...GLOW} colors={['#3b82f6', '#6366f1', '#8b5cf6']} className="flex-1">
+                <div className="p-6 flex flex-col flex-1 justify-between">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-base font-bold flex items-center gap-2">
+                      <FileText className="w-5 h-5 text-blue-400" />
+                      {"Laporan Bulanan"}
+                    </h3>
+                    <span className="text-xs font-medium text-slate-400">
+                      {new Date().toLocaleDateString('id-ID', { month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 border-b border-white/10 pb-5">
+                    <div>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">{"Pemasukan"}</p>
+                      <p className="text-lg font-black text-emerald-400">{formatIDR(summary.total_income)}</p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">{"Laba Bersih"}</p>
-                      <p className="text-4xl font-black text-white">{formatIDR(summary.profit_loss)}</p>
-                      <div className="inline-block bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full mt-4">Statistik Real-Time</div>
+                      <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 font-bold">{"Pengeluaran"}</p>
+                      <p className="text-lg font-black text-rose-400">{formatIDR(summary.total_expense)}</p>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                  <div className="mt-4">
+                    <p className="text-[10px] text-slate-400 uppercase tracking-wider mb-1 font-bold">{"Laba Bersih"}</p>
+                    <p className="text-4xl font-black">{formatIDR(summary.profit_loss)}</p>
+                    <div className="inline-block bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold px-3 py-1.5 rounded-full mt-4">Statistik Real-Time</div>
+                  </div>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Top Expenses */}
             <AnimatedContent distance={40} delay={0.7} direction="vertical" className="flex flex-col h-full">
-              <Card className="bg-card border-border shadow-sm flex flex-col w-full h-full text-foreground">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-base flex items-center gap-2 text-foreground">
-                    <Receipt className="w-5 h-5 text-muted-foreground" />
-                    {"Top 5 Pengeluaran"}
-                  </CardTitle>
-                  <CardDescription className="text-sm">{"Pengeluaran terbesar bulan ini"}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-5 pt-0 space-y-3 flex-1">
-                  {topExpenses.map((trx, idx) => (
-                    <div key={trx.id} className="bg-muted/50 border border-border p-4 rounded-xl shadow-sm flex items-center justify-between hover:bg-accent transition-colors text-foreground">
-                      <div className="flex items-center gap-4">
-                        <div className="w-8 h-8 rounded-full bg-card border border-border text-muted-foreground flex items-center justify-center text-sm font-bold shrink-0 shadow-sm">{idx + 1}</div>
-                        <div>
-                          <p className="text-sm font-bold line-clamp-1">{getTranslatedCategory(trx.action || trx.name)}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{trx.date}</p>
+              <BorderGlow {...GLOW} className="flex-1">
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="mb-1">
+                    <h3 className="text-base font-bold flex items-center gap-2">
+                      <Receipt className="w-5 h-5 text-slate-400" />
+                      {"Top 5 Pengeluaran"}
+                    </h3>
+                    <p className="text-sm text-slate-400 mt-1">{"Pengeluaran terbesar bulan ini"}</p>
+                  </div>
+                  <div className="space-y-3 mt-4 flex-1">
+                    {topExpenses.map((trx, idx) => (
+                      <div key={trx.id} className="bg-white/5 border border-white/10 p-4 rounded-xl flex items-center justify-between hover:bg-white/10 transition-colors">
+                        <div className="flex items-center gap-4">
+                          <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 text-slate-400 flex items-center justify-center text-sm font-bold shrink-0">{idx + 1}</div>
+                          <div>
+                            <p className="text-sm font-bold line-clamp-1">{getTranslatedCategory(trx.action || trx.name)}</p>
+                            <p className="text-xs text-slate-400 mt-0.5">{trx.date}</p>
+                          </div>
                         </div>
+                        <p className="text-sm font-bold text-rose-400 shrink-0">-{trx.amount}</p>
                       </div>
-                      <p className="text-sm font-bold text-rose-600 shrink-0">-{trx.amount}</p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
+                    ))}
+                  </div>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
             {/* Tracker */}
             <AnimatedContent distance={40} delay={0.8} direction="vertical" className="flex flex-col h-full">
-                <Card className="bg-card border-border shadow-sm flex flex-col h-full w-full text-foreground">
-                  <CardHeader className="pb-3 flex flex-row items-center justify-between">
+              <BorderGlow {...GLOW} className="flex-1">
+                <div className="p-6 flex flex-col flex-1">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
-                      <CardTitle className="text-base flex items-center gap-2 text-foreground">
+                      <h3 className="text-base font-bold flex items-center gap-2">
                         <Target className="w-5 h-5 text-rose-500" />
                         {"Anggaran Kategori"}
-                      </CardTitle>
-                      <CardDescription className="text-sm">{"Pantau batas pengeluaranmu dari budget"}</CardDescription>
+                      </h3>
+                      <p className="text-sm text-slate-400 mt-1">{"Pantau batas pengeluaranmu dari budget"}</p>
                     </div>
-                    <Button variant="outline" size="sm" className="h-8 gap-1 text-xs" onClick={() => setIsModalOpen(true)}>
+                    <Button variant="outline" size="sm" className="h-8 gap-1 text-xs border-white/20 hover:bg-white/10" onClick={() => setIsModalOpen(true)}>
                       <Plus className="w-3.5 h-3.5" /> Budget
                     </Button>
-                  </CardHeader>
-                  <CardContent className="p-5 space-y-6 overflow-y-auto max-h-[300px]">
+                  </div>
+                  <div className="space-y-6 overflow-y-auto max-h-[300px] flex-1">
                     {budgets.map((item, idx) => {
                       const spent = Number(item.spent || 0);
                       const limit = Number(item.amount || item.limit || 0);
@@ -302,24 +309,25 @@ export default function MobileInsights() {
                       return (
                         <div key={item.id || idx} className="space-y-2">
                           <div className="flex justify-between text-sm font-bold">
-                            <span className="text-foreground">{getTranslatedCategory(catName)}</span>
-                            <span className={isOver ? "text-rose-600" : "text-muted-foreground"}>
+                            <span>{getTranslatedCategory(catName)}</span>
+                            <span className={isOver ? "text-rose-400" : "text-slate-400"}>
                               {formatIDR(spent)} <span className="opacity-40 font-normal">/ {formatIDR(limit)}</span>
                             </span>
                           </div>
-                          <div className="w-full h-3 bg-muted rounded-full overflow-hidden shadow-inner flex shrink-0">
+                          <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden shadow-inner flex shrink-0">
                             <div className={`h-full rounded-full transition-all ${isOver ? 'bg-rose-500' : 'bg-blue-500'}`} style={{ width: `${pct}%` }}></div>
                           </div>
                           {isOver && (
-                            <p className="text-xs font-bold text-rose-500 flex items-center gap-1.5 mt-1">
+                            <p className="text-xs font-bold text-rose-400 flex items-center gap-1.5 mt-1">
                               <AlertCircle className="w-3.5 h-3.5" /> {"Peringatan: Anggaran berlebih!"}
                             </p>
                           )}
                         </div>
                       )
                     })}
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
+              </BorderGlow>
             </AnimatedContent>
           </div>
         </div>
