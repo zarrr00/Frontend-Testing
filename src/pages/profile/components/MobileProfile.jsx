@@ -95,10 +95,10 @@ export default function MobileProfile() {
     });
   };
 
-  const userName = user?.full_name || user?.name || "KasFlow User";
+  const userName = user?.full_name || user?.name || "User";
   const userEmail = user?.email || "";
   const avatarUrl = user?.avatar_url || user?.picture || null;
-  const initials = userName.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+  const initials = userName.charAt(0).toUpperCase() || "U";
 
   return (
     <div className="pb-24 p-4 md:p-6 max-w-xl mx-auto w-full space-y-6 
@@ -112,11 +112,11 @@ export default function MobileProfile() {
       {/* USER INFO */}
       <Card className="border-border bg-card shadow-sm overflow-hidden">
         <CardContent className="p-4 flex items-center gap-4">
-          <div className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-extrabold overflow-hidden ${themeBg} ${themeColor}`}>
+          <div className={`w-16 h-16 rounded-full flex items-center justify-center text-xl font-extrabold overflow-hidden shrink-0 select-none ${themeBg} ${themeColor}`}>
             {avatarUrl ? (
               <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
             ) : (
-              initials
+              <span className="leading-none">{initials}</span>
             )}
           </div>
           <div className="flex-1">

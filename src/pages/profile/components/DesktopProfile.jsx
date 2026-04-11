@@ -73,10 +73,10 @@ export default function DesktopProfile() {
     });
   };
 
-  const userName = user?.full_name || user?.name || "KasFlow User";
+  const userName = user?.full_name || user?.name || "User";
   const userEmail = user?.email || "";
   const avatarUrl = user?.avatar_url || user?.picture || null;
-  const initials = userName.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase();
+  const initials = userName.charAt(0).toUpperCase() || "U";
 
   return (
     <div className="w-full max-w-7xl mx-auto px-8 py-10 space-y-8 animate-in fade-in zoom-in-95 duration-500 bg-background text-foreground transition-colors" id="snap-main-container">
@@ -99,11 +99,11 @@ export default function DesktopProfile() {
               >
                 <Pencil className="w-5 h-5" />
               </button>
-              <div className={`w-32 h-32 rounded-full flex items-center justify-center text-5xl font-extrabold overflow-hidden ${themeBg} ${themeColor} shadow-inner`}>
+              <div className={`w-32 h-32 rounded-full flex items-center justify-center text-4xl font-extrabold overflow-hidden shrink-0 select-none ${themeBg} ${themeColor} shadow-inner`}>
                 {avatarUrl ? (
                   <img src={avatarUrl} alt={userName} className="w-full h-full object-cover" />
                 ) : (
-                  initials
+                  <span className="leading-none">{initials}</span>
                 )}
               </div>
               <div>
